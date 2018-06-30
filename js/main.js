@@ -1,15 +1,22 @@
 
 var app = app || {};
 
+accX = 10;
+accY = -3;
+damping = 0.7;
+
 app.planeWidth = 200;
+app.planeLength = 300;
+app.gravity = 1
 app.paddleWidth = 12 * app.planeWidth/100;
 app.wallZ = 0; // - 150
-app.fingers = [];
+// app.fingers = [];
 app.step = 0;
 app.guiControls = {
   bouncingSpeed: 0.05,
   rollDebug: '',
-  ballVelocityScale: 1.0
+  ballVelocityScale: 1.0,
+  gravity: 0.1
 }
 
 
@@ -20,6 +27,7 @@ app.init = () => {
   app.gui = new dat.GUI();
   app.gui.add(app.guiControls, "bouncingSpeed", 0, 1);
   app.gui.add(app.guiControls, "ballVelocityScale", -2, 2);
+  app.gui.add(app.guiControls, "gravity", 0, 0.5);
   app.gui.add(app.guiControls, "rollDebug").listen();
 
   //set up 3D
@@ -92,6 +100,15 @@ app.init = () => {
     // paddle.rotation.z = -0.5*Math.PI;
     app.scene.add( app.paddle );
 
+
+    const surfaceGeometry = new THREE.CircleGeometry(app.paddleWidth/4, 20);
+    const surfaceMaterial = new THREE.MeshBasicMaterial({ color: 0x00FF00, side: THREE.DoubleSide });
+    const surface = new THREE.Mesh( surfaceGeometry, surfaceMaterial );
+    app.paddle.add( surface );
+
+    // const paddleHelper = new THREE.FaceNormalsHelper(surface, 5, 0xFF0000, 2);
+    // app.scene.add( paddleHelper );
+
     // don't start animating until the paddle is loaded
     app.animate();
     // renderer.render( scene, camera )
@@ -112,6 +129,9 @@ app.init = () => {
 
     //converts coordinates from Leap Space to THREE scene space
     if (frame.hands[0]){
+
+       app.paddle.geometry.normalsNeedUpdate = true;
+
       // console.log(frame.hands[0].roll());
       hand = frame.hands[0]
       handMesh = hand.data('riggedHand.mesh');
@@ -143,27 +163,12 @@ app.init = () => {
       angle = THREE.Math.clamp(angle, -Math.PI/4, Math.PI/4);
       // app.guiControls.rollDebug = angle;
       app.paddle.rotation.y = angle
+
+      // app.paddle.children[0].geometry.normalsNeedUpdate = true;
+      // app.paddle.geometry.normalsNeedUpdate = true;
+      // app.paddle.updateMatrixWorld(true);
+
     }
-
-
-    // if(frame.valid && frame.gestures.length > 0) {
-    //   frame.gestures.forEach(function(gesture){
-    //     switch(gesture.type){
-    //       case "circle":
-    //         console.log("circle gesture");
-    //         break;
-    //       case "keyTap":
-    //         console.log("keyTap gesture");
-    //         break;
-    //       case "screenTap":
-    //         console.log("screenTap gesture");
-    //         break;
-    //       case "swipe":
-    //         console.log("swipe gesture");
-    //         break;
-    //     }//end switch
-    //   })//end gestures
-    // }//end if
   })//controller
 
   app.controller.use('transform', { scale: app.planeWidth/1000 })

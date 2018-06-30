@@ -80,14 +80,22 @@ app.addStats = () => {
   return stats;
 };
 
+
 app.resetBall  = () =>  {
   app.ball.position.set(0, 30, 1);
   app.ball.velocity.set(0, 0, 1);
+
+  // app.ball.position.set(0, 30, -app.planeWidth/2);
+  // app.ball.position.z = 10 - Math.cos(app.guiControls.bouncingSpeed*20)*35;
+  // let z = Math.cos(app.guiControls.bouncingSpeed*20);
+  // app.ball.velocity.set(0, 0, z);
 };
 
 app.updateBall = () => {
   const pos = app.ball.position;
   const paddle = app.paddle.position;
+
+  app.ball.velocity.y -= app.guiControls.gravity;
 
   app.ball.position.addScaledVector(
     app.ball.velocity,
@@ -113,17 +121,34 @@ app.updateBall = () => {
         pos.y <= paddle.y + app.paddleWidth/2 &&
         paddle.z - pos.z < 4){
 
-        // if (pos.z - paddle.z < 4){
-          // console.log("Hit!");
-          app.ball.velocity.multiplyScalar(-1);
-        // }
+      // if (pos.z - paddle.z < 4){
+        // console.log("Hit!");
+        // app.ball.velocity.multiplyScalar(-1);
+      // }
 
+      //ball bounce back after hitted, add y value as gravity
+      // console.log(app.ball.velocity);
+
+      app.ball.velocity.add(new THREE.Vector3(0,1,3)).multiplyScalar(-1);
+      // app.ball.velocity.reflect( app.paddle.geometry.faces[0].normal );
     }
   } // ball within x range
 
-  if(pos.z <= app.wallZ){
+  if (pos.y <= 2){
+    // app.step += app.guiControls.bouncingSpeed;
+    // pos.y = 7 + (Math.abs(Math.sin(1)*35));
+    // pos.y = 10 + Math.sin(app.guiControls.bouncingSpeed*20)*35;
+    // pos.z = 6 + (Math.abs(Math.cos(1)*35)) + pos.z;
+    app.ball.velocity.y *= -1;
+  }
+
+  // app.guiControls.rollDebug = pos.y
+
+  if (pos.z <= - app.planeLength/2 || pos.z >=200){
+    // app.ball.velocity.multiplyScalar(-1);
     app.resetBall();
   }
+
 
   // collision detection:
   //   determines if any of the rays from the cube's origin to each vertex
