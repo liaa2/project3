@@ -7,16 +7,16 @@ damping = 0.7;
 
 app.planeWidth = 200;
 app.planeLength = 300;
-app.gravity = 1
 app.paddleWidth = 12 * app.planeWidth/100;
 app.wallZ = 0; // - 150
 // app.fingers = [];
 app.step = 0;
 app.guiControls = {
-  bouncingSpeed: 0.05,
+  // bouncingSpeed: 0.05,
+  bouncingSpeed: 1,
   rollDebug: '',
-  ballVelocityScale: 1.0,
-  gravity: 0.1
+  ballVelocityScale: 2.0,
+  gravity: 0.01
 }
 
 
@@ -25,9 +25,10 @@ app.init = () => {
   console.log("loaded");
 
   app.gui = new dat.GUI();
-  app.gui.add(app.guiControls, "bouncingSpeed", 0, 1);
+  // app.gui.add(app.guiControls, "bouncingSpeed", 0, 1);
+  app.gui.add(app.guiControls, "bouncingSpeed", 0, 2);
   app.gui.add(app.guiControls, "ballVelocityScale", -2, 2);
-  app.gui.add(app.guiControls, "gravity", 0, 0.5);
+  app.gui.add(app.guiControls, "gravity", 0, 0.05);
   app.gui.add(app.guiControls, "rollDebug").listen();
 
   //set up 3D
@@ -55,6 +56,12 @@ app.init = () => {
   app.plane = app.createPlane();
   app.scene.add(app.plane);
 
+  app.line = app.createLine();
+  app.scene.add(app.line);
+
+  app.net = app.createNet();
+  app.scene.add(app.net);
+
   //ball
   app.ball = app.createBall();
   app.scene.add(app.ball);
@@ -76,23 +83,56 @@ app.init = () => {
   // scene.add( helper );
 
   //A loader for loading objects in JSON format. This uses the FileLoader internally for loading files.
+
+  // app.loaderAI = new THREE.JSONLoader();
+  // app.loaderAI.load(
+  //   //resource URl
+  //   '../paddle.js',
+  //   loadPaddleAI
+  // );
+
   //instantiate a loader
   app.loader = new THREE.JSONLoader();
   // python -m http.server
   app.loader.load(
     //resource URl
     '../paddle.js',
+    loadPaddleAI
+  );
+
+  app.loader.load(
+    //resource URl
+    '../paddle.js',
     loadPaddle
   )
 
-  //Paddle
+  //Paddle - AI
+  function loadPaddleAI(geometry, materials){
+    console.log('HERE');
+    var scale = app.planeWidth/100;
+    app.paddleAI = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial(materials) );
+    app.paddleAI.scale.set(scale, scale, scale);
+    app.paddleAI.position.set(0,30,-160);
+    app.paddleAI.rotation.y = 0;
+    app.scene.add( app.paddleAI );
+
+
+    const surfaceGeometry = new THREE.CircleGeometry(app.paddleWidth/4, 20);
+    const surfaceMaterial = new THREE.MeshBasicMaterial({ color: 0x00FF00, side: THREE.DoubleSide });
+    app.surfaceAI = new THREE.Mesh( surfaceGeometry, surfaceMaterial );
+    app.paddleAI.add( app.surfaceAI );
+    app.paddleAI.updateMatrixWorld();
+  };
+
+  //Paddle - user
   // var x,y,z;
   function loadPaddle(geometry, materials){
     console.log('HERE');
     var scale = app.planeWidth/100;
     app.paddle = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial(materials) );
     app.paddle.scale.set(scale, scale, scale);
-    app.paddle.position.set(0,30,120);
+    // app.paddle.position.set(0,30,120);
+    app.paddle.position.set(0,30,160);
     // paddle.position.set(x,y,z);
     // paddle.rotation.y = 0.5 * Math.PI;
     // paddle.rotation.x = -0.5 * Math.PI;
@@ -113,14 +153,15 @@ app.init = () => {
     // app.paddle.children[0].geometry.normalsNeedUpdate = true;
     //get the global position of surface (child object)
     app.paddle.updateMatrixWorld();
-    app.vector = new THREE.Vector3();
-    // app.surface.position = app.vector
-    app.vector.setFromMatrixPosition(app.surface.matrixWorld);
-    // app.surface.position.setFromMatrixPosition(app.surface.matrixWorld);
-    app.normalizedPosition = app.vector.setFromMatrixPosition(app.surface.matrixWorld).clone().normalize();
+    // app.vector = new THREE.Vector3();
+    // // app.surface.position = app.vector
+    // app.vector.setFromMatrixPosition(app.surface.matrixWorld);
+    // // app.surface.position.setFromMatrixPosition(app.surface.matrixWorld);
+    // app.normalizedPosition = app.vector.setFromMatrixPosition(app.surface.matrixWorld).clone().normalize();
 
-    console.log("normalized position: ", app.normalizedPosition);
-    console.log( "Original Position: " , app.vector.setFromMatrixPosition(app.surface.matrixWorld));
+    // console.log("normalized position: ", app.normalizedPosition);
+    // console.log( "Original Position: " , app.vector.setFromMatrixPosition(app.surface.matrixWorld));
+
     // var normalMatrix = new THREE.Matrix3().getNormalMatrix(app.paddle.matrixWorld);
     // var newNoraml = normal.clone().applyMartrix3(normalMatrix).normalize();
 
@@ -152,7 +193,7 @@ app.init = () => {
 
 
 
-  //=============================================================
+  //=======================mouse pad mode================================
 
   document.addEventListener("mousemove", e => {
     // console.log("e.page: ", e.pageX, e.pageY, e);
@@ -190,25 +231,7 @@ app.init = () => {
   });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  //===============================================================
-  //Leap Motion Controller
+  //===================Leap Motion Controller mode===========================
   //initiate animationFrame & gestures
   app.options = {
     frameEventName: 'animationFrame',
@@ -228,19 +251,27 @@ app.init = () => {
       hand = frame.hands[0]
       handMesh = hand.data('riggedHand.mesh');
       // handMesh.position.set(0, 30, 150 )
+
+      // Leap::Vector handSpeed = hand.palmVelocity(); -> The rate of change of the palm position in millimeters/second.
       handMesh.scenePosition(hand.palmPosition, app.paddle.position);
       app.paddle.position.z += 150;
 
-      //link hand roll with paddle rotation along y axis
-      // if (frame.hands[0].roll()>=0) {
-      //   app.paddle.rotation.y  += Math.abs((frame.hands[0].roll()))
-      // } else {
-      //   app.paddle.rotation.y -= Math.abs((frame.hands[0].roll()))
-      // }
 
-      // using roll():
+      //using pitch() - hand rotation along x axis:
+      let xAngleLM = THREE.Math.mapLinear(
+        frame.hands[0].pitch(),
+        -2, 2,
+        -Math.PI/4, Math.PI/4
+      );
 
-      let angle = THREE.Math.mapLinear(
+      // If this vector's x, y or z value is greater than/less than the max/min vector's x, y or z value, it is replaced by the corresponding value.
+      xAngleLM = THREE.Math.clamp(xAngleLM, -Math.PI/4, Math.PI/4);
+      app.paddle.rotation.x = xAngleLM;
+
+
+
+      // using roll() - hand rotation along y axis:
+      let yAngleLM = THREE.Math.mapLinear(
         frame.hands[0].roll(),   //value to map
         -2, 2,   //min & max input range
         Math.PI/4, -Math.PI/4  //min & max output
@@ -252,9 +283,9 @@ app.init = () => {
       //   Math.PI/4, -Math.PI/4  //min & max output
       // );
 
-      angle = THREE.Math.clamp(angle, -Math.PI/4, Math.PI/4);
+      yAngleLM = THREE.Math.clamp(yAngleLM, -Math.PI/4, Math.PI/4);
       // app.guiControls.rollDebug = angle;
-      app.paddle.rotation.y = angle
+      app.paddle.rotation.y = yAngleLM
 
       // app.paddle.children[0].geometry.normalsNeedUpdate = true;
       // app.paddle.geometry.normalsNeedUpdate = true;

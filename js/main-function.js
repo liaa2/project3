@@ -1,11 +1,26 @@
  var app = app || {};
 
 
+app.AI = {
+  doneAdjustments: true
+};
+// app.human = {
+//   justHit: false
+// };
+
+app.justHit = 'AI';
+
+app.updateJustHit = () => {
+  app.justHit = app.justHit === 'AI' ? 'human' : 'AI';
+  app.guiControls.rollDebug = app.justHit;
+}
+
+//create table surface
 app.createPlane = () => {
   var planeMaterial = new THREE.MeshLambertMaterial({ color: 0x3080C9 });
   // let planeWidth = 150;
-  let planeLength = 300;
-  var planeGeometry = new THREE.PlaneGeometry(app.planeWidth, planeLength, 30)
+  // let planeLength = 300;
+  var planeGeometry = new THREE.PlaneGeometry(app.planeWidth, app.planeLength, 30)
   // create the surface
   var plane = new THREE.Mesh(planeGeometry, planeMaterial);
   plane.rotation.x = -0.5 * Math.PI;
@@ -13,7 +28,32 @@ app.createPlane = () => {
   return plane;
 };
 
+//create net
+app.createNet = () => {
+  var netGeometry = new THREE.PlaneGeometry( app.planeWidth, 12);
+  var netMaterial = new THREE.MeshBasicMaterial( {
+    color: 0xffffff,
+    side: THREE.DoubleSide,
+    // wireframe: true
+  } );
+  var net = new THREE.Mesh(netGeometry, netMaterial);
+  net.position.y = 6;
+  return net;
+}
 
+app.createLine = () => {
+  var lineGeometry = new THREE.PlaneGeometry( 0.6, app.planeLength);
+  var lineMaterial = new THREE.MeshBasicMaterial( {
+    color: 0xffffff,
+    side: THREE.DoubleSide,
+  } );
+  var line = new THREE.Mesh(lineGeometry, lineMaterial);
+  line.position.set(0,0.2,0)
+  line.rotation.x = -0.5 * Math.PI;
+  return line;
+}
+
+//create ping pong ball
 app.createBall = () => {
   var geometry = new THREE.SphereGeometry( 2, 30, 30)
   var material = new THREE.MeshStandardMaterial( { color: 0xffd046 })
@@ -25,6 +65,7 @@ app.createBall = () => {
   return sphere;
 };
 
+//create lights
 app.createAmbientlight = () => {
   var ambientLight = new THREE.AmbientLight (0xffffff, 0.5);
   return ambientLight;
@@ -36,6 +77,8 @@ app.createPointlight = () => {
   return pointLight;
 }
 
+
+//create axes helper
 app.createHelper = () => {
   var helper = new THREE.AxesHelper( 10 );
   return helper
@@ -47,21 +90,10 @@ app.createHelper = () => {
 //animation
 app.animate = () => {
   app.paddleHelper.update();
-  // console.log("animate");
 
-  // app.sphere.rotation.x += Math.PI/50;
-  // app.sphere.rotation.y += Math.PI/50;
-  //
-  //ball bouncing
-  app.step += app.guiControls.bouncingSpeed;
-  // console.log(app.step);
-  // app.ball.position.x = 20 + (Math.cos(app.step)*10);
-  // app.ball.position.y = 6 + (Math.abs(Math.sin(app.step))*10);
+  app.updateAI();
 
   app.updateBall();
-  // app.ball.position.y = 6 + app.step
-
-  // paddle.rotation.x = Math.PI/2;
 
   app.stats.update();
 
@@ -69,6 +101,8 @@ app.animate = () => {
   requestAnimationFrame(app.animate);
 }
 
+
+//add Stats
 app.addStats = () => {
   const stats = new Stats();
   stats.setMode(0);
@@ -82,16 +116,37 @@ app.addStats = () => {
 };
 
 
-app.resetBall  = () =>  {
-  app.ball.position.set(0, 30, 1);
-  app.ball.velocity.set(0, 0, 1);
+//AI paddle moves
+app.updateAI = () => {
 
-  // app.ball.position.set(0, 30, -app.planeWidth/2);
-  // app.ball.position.z = 10 - Math.cos(app.guiControls.bouncingSpeed*20)*35;
-  // let z = Math.cos(app.guiControls.bouncingSpeed*20);
-  // app.ball.velocity.set(0, 0, z);
+  // try to match ball X position as soon as it's moving in direction of AI player
+  if (app.ball.velocity.z < 0 ){
+    app.paddleAI.position.x = app.ball.position.x;
+
+    // Choose a random rotation when the ball is close enough
+    // console.log(app.paddleAI.z, app.ball.position.z, (app.paddleAI.z - app.ball.position.z));
+
+  }
+  // else {
+  //   app.paddleAI.position.x = 0;
+  //   app.paddleAI.rotation.x = 0;
+  //   app.paddleAI.rotation.y = 0;
+  // }
+}
+
+
+//Reset game
+app.resetBall  = () =>  {
+  // app.ball.position.set(0, 30, 1);
+
+  //start at random x position
+  app.ball.position.set(Math.random()*201-100, 30, -app.planeLength/2);
+  // app.ball.velocity.set(0, 0, 1);
+  app.ball.velocity.set(0, 0, app.guiControls.bouncingSpeed);
+  // app.ball.velocity.set(0, 0, 2);
 };
 
+//Ping pong ball moves
 app.updateBall = () => {
   const pos = app.ball.position;
   const paddle = app.paddle.position;
@@ -115,73 +170,136 @@ app.updateBall = () => {
   //   app.resetBall();
   // }
 
-  if( pos.x >= paddle.x - app.paddleWidth/2 &&
-      pos.x <= paddle.x + app.paddleWidth/2){
+  // app.withinBounceRange(app.ball, app.paddle)
 
-    if( pos.y >= paddle.y - app.paddleWidth/2 &&
-        pos.y <= paddle.y + app.paddleWidth/2 &&
-        paddle.z - pos.z < 4 &&
-         app.ball.velocity.z > 0 ){
+  if( app.justHit === 'AI'
+      && app.ball.velocity.z > 0
+      && (paddle.z - pos.z) < 4
+      && app.withinBounceRange(app.ball, app.paddle) ){
 
-      // if (pos.z - paddle.z < 4){
-        // console.log("Hit!");
-        // app.ball.velocity.multiplyScalar(-1);
-      // }
+      let normalMatrix = new THREE.Matrix3().getNormalMatrix( app.surface.matrixWorld );
+      let normalizedNormal = app.surface.geometry.faces[0].normal.clone().applyMatrix3( normalMatrix ).normalize();
 
-      //ball bounce back after hitted, add y value as gravity
-      // console.log(app.ball.velocity);
+      console.log('reflecting!');
 
-      // app.ball.velocity.add(new THREE.Vector3(0,1,3)).multiplyScalar(-1);
+      app.ball.velocity.reflect( normalizedNormal ).multiplyScalar(app.guiControls.bouncingSpeed);
+      app.updateJustHit(); // toggle the value for who just hit
 
-      // app.ball.velocity.reflect(app.normalizedPosition).multiplyScalar(5)
+      // Do the one-off AI decisions
+      console.log('UPDATE AI MOVE');
+      app.paddleAI.rotation.y = THREE.Math.randFloat(Math.PI/8, -Math.PI/8);
+      // app.paddleAI.rotation.y = (Math.random())*(-Math.PI/2) + Math.PI/4
 
-      const normalMatrix = new THREE.Matrix3().getNormalMatrix( app.surface.matrixWorld );
-      const normalizedNormal = app.surface.geometry.faces[0].normal.clone().applyMatrix3( normalMatrix ).normalize()
 
-      app.ball.velocity.reflect( normalizedNormal );
-      console.log('reflecting');
-       //.multiplyScalar(1.2);
+  } else if (app.ball.velocity.z < 0
+    && app.paddleAI.position.z - pos.z > -4
+    && app.withinBounceRange(app.ball, app.paddleAI) ){
+    // if (pos.x >= app.paddleAI.x - app.paddleWidth/2
+    //   && pos.x <= app.paddleAI.x + app.paddleWidth/2
+    //   && pos.y >= app.paddleAI.y - app.paddleWidth/2
+    //   && pos.y <= app.paddleAI.y + app.paddleWidth/2) {
 
-      // console.log(app.ball.velocity.reflect(app.normalizedPosition));
-      // app.ball.velocity.reflect( app.paddle.geometry.faces[0].normal );
-    }
-  } // ball within x range
+      let normalMatrix = new THREE.Matrix3().getNormalMatrix( app.surfaceAI.matrixWorld );
+      let normalizedNormal = app.surfaceAI.geometry.faces[0].normal.clone().applyMatrix3( normalMatrix ).normalize();
 
+      console.log('reflecting back!');
+
+      // app.ball.velocity.multiplyScalar(-1)
+      app.ball.velocity.reflect( normalizedNormal ).multiplyScalar(app.guiControls.bouncingSpeed);
+      app.updateJustHit(); // toggle the value for who just hit
+
+    // }
+  }
+
+  //============ ball collides with user's paddle ====================
+  // if( pos.x >= paddle.x - app.paddleWidth/2 &&
+  //     pos.x <= paddle.x + app.paddleWidth/2){
+  //
+  //   if( pos.y >= paddle.y - app.paddleWidth/2 &&
+  //       pos.y <= paddle.y + app.paddleWidth/2 &&
+  //       paddle.z - pos.z < 4 &&
+  //        app.ball.velocity.z > 0 ){
+  //
+  //     // if (pos.z - paddle.z < 4){
+  //       // console.log("Hit!");
+  //       // app.ball.velocity.multiplyScalar(-1);
+  //     // }
+  //
+  //     //ball bounce back after hitted, add y value as gravity
+  //     // console.log(app.ball.velocity);
+  //
+  //     // app.ball.velocity.add(new THREE.Vector3(0,1,3)).multiplyScalar(-1);
+  //
+  //     // app.ball.velocity.reflect(app.normalizedPosition).multiplyScalar(5)
+  //
+  //     const normalMatrix = new THREE.Matrix3().getNormalMatrix( app.surface.matrixWorld );
+  //     const normalizedNormal = app.surface.geometry.faces[0].normal.clone().applyMatrix3( normalMatrix ).normalize()
+  //
+  //     // app.ball.velocity.reflect( normalizedNormal );
+  //     console.log('reflecting');
+  //      //.multiplyScalar(1.2);
+  //
+  //     app.ball.velocity.reflect( normalizedNormal ).multiplyScalar(app.guiControls.bouncingSpeed);
+  //
+  //     // console.log(app.ball.velocity.reflect(app.normalizedPosition));
+  //     // app.ball.velocity.reflect( app.paddle.geometry.faces[0].normal );
+  //   }
+  // } // ball within x range - inbound
+
+
+
+  //if hit the table, change y axis direction so the ball would go up
   if (pos.y <= 2){
-    // app.step += app.guiControls.bouncingSpeed;
-    // pos.y = 7 + (Math.abs(Math.sin(1)*35));
-    // pos.y = 10 + Math.sin(app.guiControls.bouncingSpeed*20)*35;
-    // pos.z = 6 + (Math.abs(Math.cos(1)*35)) + pos.z;
     app.ball.velocity.y *= -1;
   }
-
   // app.guiControls.rollDebug = pos.y
 
-  if (pos.z <= - app.planeLength/2 || pos.z >=200){
-    // app.ball.velocity.multiplyScalar(-1);
+
+  //if user missed the ball
+  if (pos.z >=200){
+    console.log("You lose 1 point");
     app.resetBall();
   }
-
-
-  // collision detection:
-  //   determines if any of the rays from the cube's origin to each vertex
-  //		intersects any face of a mesh in the array of target meshes
-  //   for increased collision accuracy, add more vertices to the cube;
-  //		for example, new THREE.CubeGeometry( 64, 64, 64, 8, 8, 8, wireMaterial )
-  //   HOWEVER: when the origin of the ray is within the target mesh, collisions do not occur
-  // var originPoint = app.ball.position.clone();
-  //
-  // for (var vertexIndex = 0; vertexIndex < app.ball.geometry.vertices.length; vertexIndex++)
-  // {
-  //   var localVertex = app.ball.geometry.vertices[vertexIndex].clone();
-  //   var globalVertex = localVertex.applyMatrix4( app.ball.matrix );
-  //   var directionVector = globalVertex.sub( app.ball.position );
-  //
-  //   var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
-  //   var collisionResults = ray.intersectObject( app.paddle );
-  //   // console.log(collisionResults);
-  //   if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() )
-  //     console.warn(" Hit ");
+  // else if (pos.z < app.paddleAI.position.z) {
+  //   console.log("You won 1 point");
+  //   app.resetBall();
   // }
 
+  // out of side of the table
+  // if (pos.x > 0 && pos.x - app.planeWidth/2 > 0 || pos.x < 0 && pos.x - app.planeWidth/2 < -100){
+  //   console.log("out of range!!");
+  // }
+
+
+  //if user hits pack, opponent's turn:
+  // if (pos.z <= 10 - app.planeLength/2) {
+  //
+  //   const normalMatrix = new THREE.Matrix3().getNormalMatrix( app.surface.matrixWorld );
+  //   const normalizedNormal = app.surface.geometry.faces[0].normal.clone().applyMatrix3( normalMatrix ).normalize()
+  //
+  //   // app.ball.velocity.reflect( normalizedNormal );
+  //   console.log('reflecting back');
+  //    //.multiplyScalar(1.2);
+  //
+  //   app.ball.velocity.reflect( normalizedNormal ).multiplyScalar(app.guiControls.bouncingSpeed);
+  // }
+
+
+  // if (pos.z <= - app.planeLength/2 || pos.z >=200){
+  //   // app.ball.velocity.multiplyScalar(-1);
+  //   app.resetBall();
+  // }
+};
+
+
+app.withinBounceRange = (ball, paddle) => {
+  return (
+    // (ball.velocity.z > 0
+    //   &&
+    // Math.abs(paddle.position.z - ball.position.z) < 4)
+    ball.position.x >= (paddle.position.x - app.paddleWidth/2)
+    && ball.position.x <= (paddle.position.x + app.paddleWidth/2)
+    && ball.position.y >= (paddle.position.y - app.paddleWidth/2)
+    && ball.position.y <= (paddle.position.y + app.paddleWidth/2)
+  );
 };
