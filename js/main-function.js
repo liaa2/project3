@@ -183,7 +183,7 @@ app.updateBall = () => {
       console.log('reflecting!');
 
       app.ball.velocity.reflect( normalizedNormal ).multiplyScalar(app.guiControls.bouncingSpeed);
-      app.updateJustHit(); // toggle the value for who just hit
+      app.justHit = "human"; // toggle the value for who just hit
 
       // Do the one-off AI decisions
       console.log('UPDATE AI MOVE');
@@ -206,7 +206,7 @@ app.updateBall = () => {
 
       // app.ball.velocity.multiplyScalar(-1)
       app.ball.velocity.reflect( normalizedNormal ).multiplyScalar(app.guiControls.bouncingSpeed);
-      app.updateJustHit(); // toggle the value for who just hit
+      app.justHit = "AI" // toggle the value for who just hit
 
     // }
   }
