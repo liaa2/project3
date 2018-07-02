@@ -102,12 +102,47 @@ app.init = () => {
 
 
     const surfaceGeometry = new THREE.CircleGeometry(app.paddleWidth/4, 20);
+    // const surfaceGeometry = new THREE.CircleBufferGeometry(app.paddleWidth/4, 8);
     const surfaceMaterial = new THREE.MeshBasicMaterial({ color: 0x00FF00, side: THREE.DoubleSide });
-    const surface = new THREE.Mesh( surfaceGeometry, surfaceMaterial );
-    app.paddle.add( surface );
+    app.surface = new THREE.Mesh( surfaceGeometry, surfaceMaterial );
+    // surface.geometry.computeFaceNormals();
+    app.paddle.add( app.surface );
+    // app.scene.add(app.surface);
+    // app.paddle.children[0].position = app.paddle.position;
 
-    // const paddleHelper = new THREE.FaceNormalsHelper(surface, 5, 0xFF0000, 2);
+    // app.paddle.children[0].geometry.normalsNeedUpdate = true;
+    //get the global position of surface (child object)
+    app.paddle.updateMatrixWorld();
+    app.vector = new THREE.Vector3();
+    // app.surface.position = app.vector
+    app.vector.setFromMatrixPosition(app.surface.matrixWorld);
+    // app.surface.position.setFromMatrixPosition(app.surface.matrixWorld);
+    app.normalizedPosition = app.vector.setFromMatrixPosition(app.surface.matrixWorld).clone().normalize();
+
+    console.log("normalized position: ", app.normalizedPosition);
+    console.log( "Original Position: " , app.vector.setFromMatrixPosition(app.surface.matrixWorld));
+    // var normalMatrix = new THREE.Matrix3().getNormalMatrix(app.paddle.matrixWorld);
+    // var newNoraml = normal.clone().applyMartrix3(normalMatrix).normalize();
+
+
+    app.paddleHelper = new THREE.FaceNormalsHelper(app.surface, 5, 0xFF0000, 2);
+    app.scene.add( app.paddleHelper );
+    // const normal = surfaceGeometry.computeFaceNormals();
+    // console.log(normal);
+
+    // console.log(app.paddle.position.setFromMatrixPosition(surface.matmatrixWorld));
+
+    // app.normal = new THREE.Vector3();
+    // for (var i = 0; i < app.surface.geometry.faces.length; i++) {
+    //   let coordinate = app.surface.geometry.faces[i].normal
+    //   app.normal.add(coordinate);
+    // }
+    // console.log(app.normal);
+
+    // const paddleHelper = new THREE.VertexNormalsHelper(surface, 5, 0xFF0000, 2);
     // app.scene.add( paddleHelper );
+
+
 
     // don't start animating until the paddle is loaded
     app.animate();
@@ -116,6 +151,63 @@ app.init = () => {
   // app.animate();
 
 
+
+  //=============================================================
+
+  document.addEventListener("mousemove", e => {
+    // console.log("e.page: ", e.pageX, e.pageY, e);
+
+    if( e.shiftKey ){
+      const yAngle = THREE.Math.mapLinear(
+        e.pageX,
+        0, window.innerWidth,
+        Math.PI/4, -Math.PI/4
+      );
+      app.paddle.rotation.y = yAngle;
+
+      const xAngle = THREE.Math.mapLinear(
+        e.pageY,
+        0, window.innerHeight,
+        Math.PI/4, -Math.PI/4
+      );
+      app.paddle.rotation.x = xAngle;
+      return; // don't change the position with the code below
+    }
+
+
+    app.paddle.position.x = THREE.Math.mapLinear(
+      e.pageX,
+      0, window.innerWidth,
+      -100, 100
+    );
+    app.paddle.position.y = THREE.Math.mapLinear(
+      e.pageY,
+      0, window.innerHeight,
+      60, 10
+    );
+
+    // app.paddle.position.y = THREE.Math.mapLinear(e.pagey, 90, 1000, )
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  //===============================================================
   //Leap Motion Controller
   //initiate animationFrame & gestures
   app.options = {
@@ -167,6 +259,10 @@ app.init = () => {
       // app.paddle.children[0].geometry.normalsNeedUpdate = true;
       // app.paddle.geometry.normalsNeedUpdate = true;
       // app.paddle.updateMatrixWorld(true);
+      // app.paddle.updateMatrixWorld();
+      // app.surface.position.setFromMatrixPosition(app.surface.matrixWorld);
+      // console.log(app.normalizedPosition);
+      // console.log(app.vector.setFromMatrixPosition(app.surface.matrixWorld));
 
     }
   })//controller

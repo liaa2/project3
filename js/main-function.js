@@ -46,6 +46,7 @@ app.createHelper = () => {
 
 //animation
 app.animate = () => {
+  app.paddleHelper.update();
   // console.log("animate");
 
   // app.sphere.rotation.x += Math.PI/50;
@@ -119,7 +120,8 @@ app.updateBall = () => {
 
     if( pos.y >= paddle.y - app.paddleWidth/2 &&
         pos.y <= paddle.y + app.paddleWidth/2 &&
-        paddle.z - pos.z < 4){
+        paddle.z - pos.z < 4 &&
+         app.ball.velocity.z > 0 ){
 
       // if (pos.z - paddle.z < 4){
         // console.log("Hit!");
@@ -129,7 +131,18 @@ app.updateBall = () => {
       //ball bounce back after hitted, add y value as gravity
       // console.log(app.ball.velocity);
 
-      app.ball.velocity.add(new THREE.Vector3(0,1,3)).multiplyScalar(-1);
+      // app.ball.velocity.add(new THREE.Vector3(0,1,3)).multiplyScalar(-1);
+
+      // app.ball.velocity.reflect(app.normalizedPosition).multiplyScalar(5)
+
+      const normalMatrix = new THREE.Matrix3().getNormalMatrix( app.surface.matrixWorld );
+      const normalizedNormal = app.surface.geometry.faces[0].normal.clone().applyMatrix3( normalMatrix ).normalize()
+
+      app.ball.velocity.reflect( normalizedNormal );
+      console.log('reflecting');
+       //.multiplyScalar(1.2);
+
+      // console.log(app.ball.velocity.reflect(app.normalizedPosition));
       // app.ball.velocity.reflect( app.paddle.geometry.faces[0].normal );
     }
   } // ball within x range
