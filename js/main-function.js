@@ -207,6 +207,7 @@ app.updateBall = () => {
       // app.ball.velocity.multiplyScalar(-1)
       app.ball.velocity.reflect( normalizedNormal ).multiplyScalar(app.guiControls.bouncingSpeed);
       app.justHit = "AI" // toggle the value for who just hit
+      console.log(app.justHit);
 
     // }
   }
