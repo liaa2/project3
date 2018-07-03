@@ -14,10 +14,19 @@ app.guiControls = {
   bouncingSpeed: 1.2,
   rollDebug: '',
   ballVelocityScale: 1.5,
-  gravity: 0.018,
+  gravity: 0.03,
   sideWalls: true,
-  cheatY: true
+  cheat: true,
+  hasCrossed: false
 }
+
+
+app.justHit = 'AI';
+app.justServed = true;
+// app.aiBounce = 0;
+// app.humanBounce = 0;
+app.bounce = 0;
+app.hasBouncedOnOppositeSide = false;
 
 app.config = {
   doBallUpdate: true,
@@ -33,8 +42,11 @@ app.init = () => {
   app.gui.add(app.guiControls, "ballVelocityScale", 0, 3);
   app.gui.add(app.guiControls, "gravity", 0, 0.05);
   app.gui.add(app.guiControls, "sideWalls");
-  app.gui.add(app.guiControls, "cheatY");
+  app.gui.add(app.guiControls, "cheat");
   app.gui.add(app.guiControls, "rollDebug").listen();
+  app.gui.add(app, "justHit").listen();
+  app.gui.add(app, "justServed").listen();
+  app.gui.add(app.guiControls, "hasCrossed").listen();
 
   //set up 3D
   app.scene = new THREE.Scene()
@@ -92,8 +104,8 @@ app.init = () => {
   app.scene.add(app.pointLight);
 
   //helper - (0,0,0) coordinates
-  app.helper = app.createHelper();
-  app.scene.add(app.helper);
+  // app.helper = app.createHelper();
+  // app.scene.add(app.helper);
 
   // var helper = new THREE.AxisHelper( 10 );
   // var helper = new THREE.AxesHelper( 10 );
@@ -287,24 +299,36 @@ app.init = () => {
       );
 
       //using pitch() - hand rotation along x axis:
-      let xAngleLM = THREE.Math.mapLinear(
-        frame.hands[0].pitch(),
-        -2, 2,
-        // -Math.PI/4, Math.PI/4
-        -Math.PI/2, 0
-      );
+      if (app.paddle.position.y > 45) {
+        let xAngleLM = THREE.Math.mapLinear(
+          frame.hands[0].pitch(),
+          -2, 2,
+          // -Math.PI/4, Math.PI/4
+          -Math.PI/6, Math.PI/12
+        );
+        // If this vector's x, y or z value is greater than/less than the max/min vector's x, y or z value, it is replaced by the corresponding value.
+        xAngleLM = THREE.Math.clamp(xAngleLM, -Math.PI/4, Math.PI/4);
+        app.paddle.rotation.x = xAngleLM;
+      } else {
+        let xAngleLM = THREE.Math.mapLinear(
+          frame.hands[0].pitch(),
+          -2, 2,
+          // -Math.PI/4, Math.PI/4
+          -Math.PI/8, Math.PI/6
+        );
+        xAngleLM = THREE.Math.clamp(xAngleLM, -Math.PI/4, Math.PI/4);
+        app.paddle.rotation.x = xAngleLM;
+      }
 
-      // If this vector's x, y or z value is greater than/less than the max/min vector's x, y or z value, it is replaced by the corresponding value.
-      xAngleLM = THREE.Math.clamp(xAngleLM, -Math.PI/4, Math.PI/4);
-      app.paddle.rotation.x = xAngleLM;
 
 
 
       // using roll() - hand rotation along y axis:
+
       let yAngleLM = THREE.Math.mapLinear(
         frame.hands[0].roll(),   //value to map
         -2, 2,   //min & max input range
-        Math.PI/4, -Math.PI/4  //min & max output
+        Math.PI/5, -Math.PI/5  //min & max output
       );
       // app.guiControls.rollDebug = frame.hands[0].pitch() ;
       // let angle = THREE.Math.mapLinear(
@@ -367,7 +391,7 @@ app.onResize = () => {
 window.addEventListener('resize', app.onResize, false);
 
 document.addEventListener('keydown', ev => {
-  console.log(ev.keyCode, ev.key);
+  // console.log(ev.keyCode, ev.key);
   switch(ev.key){
     case ' ':
       app.config.doBallUpdate = !app.config.doBallUpdate;
