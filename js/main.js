@@ -1,9 +1,7 @@
 
 var app = app || {};
 
-accX = 10;
-accY = -3;
-damping = 0.7;
+// let reduction = 0.3
 
 app.planeWidth = 200;
 app.planeLength = 300;
@@ -13,12 +11,17 @@ app.wallZ = 0; // - 150
 app.step = 0;
 app.guiControls = {
   // bouncingSpeed: 0.05,
-  bouncingSpeed: 1,
+  bouncingSpeed: 1.2,
   rollDebug: '',
-  ballVelocityScale: 2.0,
-  gravity: 0.01
+  ballVelocityScale: 1.5,
+  gravity: 0.018,
+  sideWalls: true,
+  cheatY: true
 }
 
+app.config = {
+  doBallUpdate: true,
+}
 
 
 app.init = () => {
@@ -27,8 +30,10 @@ app.init = () => {
   app.gui = new dat.GUI();
   // app.gui.add(app.guiControls, "bouncingSpeed", 0, 1);
   app.gui.add(app.guiControls, "bouncingSpeed", 0, 2);
-  app.gui.add(app.guiControls, "ballVelocityScale", -2, 2);
+  app.gui.add(app.guiControls, "ballVelocityScale", 0, 3);
   app.gui.add(app.guiControls, "gravity", 0, 0.05);
+  app.gui.add(app.guiControls, "sideWalls");
+  app.gui.add(app.guiControls, "cheatY");
   app.gui.add(app.guiControls, "rollDebug").listen();
 
   //set up 3D
@@ -58,6 +63,18 @@ app.init = () => {
 
   app.line = app.createLine();
   app.scene.add(app.line);
+
+  app.upLine = app.createUpLine();
+  app.scene.add(app.upLine);
+
+  app.downLine = app.createDownLine();
+  app.scene.add(app.downLine);
+
+  app.leftLine = app.createLeftLine();
+  app.scene.add(app.leftLine);
+
+  app.rightLine = app.createRightLine();
+  app.scene.add(app.rightLine);
 
   app.net = app.createNet();
   app.scene.add(app.net);
@@ -133,6 +150,7 @@ app.init = () => {
     app.paddle.scale.set(scale, scale, scale);
     // app.paddle.position.set(0,30,120);
     app.paddle.position.set(0,30,160);
+    app.paddle.velocity = new THREE.Vector3(0,0,0);
     // paddle.position.set(x,y,z);
     // paddle.rotation.y = 0.5 * Math.PI;
     // paddle.rotation.x = -0.5 * Math.PI;
@@ -152,7 +170,9 @@ app.init = () => {
 
     // app.paddle.children[0].geometry.normalsNeedUpdate = true;
     //get the global position of surface (child object)
-    app.paddle.updateMatrixWorld();
+
+    // app.paddle.updateMatrixWorld();
+
     // app.vector = new THREE.Vector3();
     // // app.surface.position = app.vector
     // app.vector.setFromMatrixPosition(app.surface.matrixWorld);
@@ -166,8 +186,11 @@ app.init = () => {
     // var newNoraml = normal.clone().applyMartrix3(normalMatrix).normalize();
 
 
-    app.paddleHelper = new THREE.FaceNormalsHelper(app.surface, 5, 0xFF0000, 2);
-    app.scene.add( app.paddleHelper );
+    // app.paddleHelper = new THREE.FaceNormalsHelper(app.surface, 5, 0xFF0000, 2);
+    // app.scene.add( app.paddleHelper );
+
+
+
     // const normal = surfaceGeometry.computeFaceNormals();
     // console.log(normal);
 
@@ -195,40 +218,40 @@ app.init = () => {
 
   //=======================mouse pad mode================================
 
-  document.addEventListener("mousemove", e => {
-    // console.log("e.page: ", e.pageX, e.pageY, e);
-
-    if( e.shiftKey ){
-      const yAngle = THREE.Math.mapLinear(
-        e.pageX,
-        0, window.innerWidth,
-        Math.PI/4, -Math.PI/4
-      );
-      app.paddle.rotation.y = yAngle;
-
-      const xAngle = THREE.Math.mapLinear(
-        e.pageY,
-        0, window.innerHeight,
-        Math.PI/4, -Math.PI/4
-      );
-      app.paddle.rotation.x = xAngle;
-      return; // don't change the position with the code below
-    }
-
-
-    app.paddle.position.x = THREE.Math.mapLinear(
-      e.pageX,
-      0, window.innerWidth,
-      -100, 100
-    );
-    app.paddle.position.y = THREE.Math.mapLinear(
-      e.pageY,
-      0, window.innerHeight,
-      60, 10
-    );
-
-    // app.paddle.position.y = THREE.Math.mapLinear(e.pagey, 90, 1000, )
-  });
+  // document.addEventListener("mousemove", e => {
+  //   // console.log("e.page: ", e.pageX, e.pageY, e);
+  //
+  //   if( e.shiftKey ){
+  //     const yAngle = THREE.Math.mapLinear(
+  //       e.pageX,
+  //       0, window.innerWidth,
+  //       Math.PI/4, -Math.PI/4
+  //     );
+  //     app.paddle.rotation.y = yAngle;
+  //
+  //     const xAngle = THREE.Math.mapLinear(
+  //       e.pageY,
+  //       0, window.innerHeight,
+  //       Math.PI/4, -Math.PI/4
+  //     );
+  //     app.paddle.rotation.x = xAngle;
+  //     return; // don't change the position with the code below
+  //   }
+  //
+  //
+  //   app.paddle.position.x = THREE.Math.mapLinear(
+  //     e.pageX,
+  //     0, window.innerWidth,
+  //     -100, 100
+  //   );
+  //   app.paddle.position.y = THREE.Math.mapLinear(
+  //     e.pageY,
+  //     0, window.innerHeight,
+  //     60, 10
+  //   );
+  //
+  //   // app.paddle.position.y = THREE.Math.mapLinear(e.pagey, 90, 1000, )
+  // });
 
 
   //===================Leap Motion Controller mode===========================
@@ -248,20 +271,27 @@ app.init = () => {
        app.paddle.geometry.normalsNeedUpdate = true;
 
       // console.log(frame.hands[0].roll());
-      hand = frame.hands[0]
+      const hand = frame.hands[0];
       handMesh = hand.data('riggedHand.mesh');
       // handMesh.position.set(0, 30, 150 )
 
       // Leap::Vector handSpeed = hand.palmVelocity(); -> The rate of change of the palm position in millimeters/second.
       handMesh.scenePosition(hand.palmPosition, app.paddle.position);
       app.paddle.position.z += 150;
+      app.paddle.position.x *= 2;
 
+      app.paddle.velocity = new THREE.Vector3(
+        hand.palmVelocity[0],
+        hand.palmVelocity[1],
+        hand.palmVelocity[2]
+      );
 
       //using pitch() - hand rotation along x axis:
       let xAngleLM = THREE.Math.mapLinear(
         frame.hands[0].pitch(),
         -2, 2,
-        -Math.PI/4, Math.PI/4
+        // -Math.PI/4, Math.PI/4
+        -Math.PI/2, 0
       );
 
       // If this vector's x, y or z value is greater than/less than the max/min vector's x, y or z value, it is replaced by the corresponding value.
@@ -308,7 +338,7 @@ app.init = () => {
     // camera: camera,
     // renderFn: () => renderer.render(scene, camera),
     // scale: 0.001,
-    // positionScale: 1.5,
+    // positionScale: 2,
     // offset: new THREE.Vector3(1000, 3090000, 120000),
     // materialOptions: {
     //   wireframe: true
@@ -335,3 +365,16 @@ app.onResize = () => {
 };
 
 window.addEventListener('resize', app.onResize, false);
+
+document.addEventListener('keydown', ev => {
+  console.log(ev.keyCode, ev.key);
+  switch(ev.key){
+    case ' ':
+      app.config.doBallUpdate = !app.config.doBallUpdate;
+      console.log(`Ball movement ${ app.config.doBallUpdate ? 'unpaused' : 'paused'}.`)
+      break;
+    case 'Enter':
+      app.restartGame();
+      break;
+  }
+});
