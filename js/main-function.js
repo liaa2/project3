@@ -182,6 +182,9 @@ app.createSpotlight = (x, y, z , color, intensity=1.0) => {
 //animation
 app.animate = () => {
   // app.paddleHelper.update();
+
+  app.humanStart();
+
   app.cheat();
 
   app.updateAI();
@@ -232,6 +235,16 @@ app.updateAI = () => {
   // }
 }
 
+
+//human turn to hit the ball and start the game
+app.humanStart = () => {
+  if (app.winner==="AI" && app.withinBounceRange(app.ball, app.paddle) && (app.paddle.position.z - app.ball.position.z) < 3) {
+    app.ball.velocity.z += app.paddle.velocity.z * app.config.humanHitVelocityScale;
+    app.winner = "";
+  }
+};
+
+
 app.newGame = () => {
   console.log('here');
   document.getElementById("scores").innerHTML = "0 - 0";
@@ -242,6 +255,7 @@ app.newGame = () => {
   } else {
     app.ball.position.set(0, 30, -150);
     app.ball.velocity.set(0, 0, 1.3);
+    app.winner = "";
   }
   app.paddleAI.rotation.x = 0;
   app.paddleAI.rotation.y = 0;
@@ -251,7 +265,7 @@ app.newGame = () => {
   app.paddle.scale.set(scale, scale, scale);
   app.paddleAI.scale.set(scale, scale, scale);
 
-  app.winner = "";
+  // app.winner = "";
   app.bounce = 0;
   app.aiScore = 0;
   app.humanScore = 0;
@@ -261,7 +275,7 @@ app.newGame = () => {
 }
 
 
-//Reset game
+//Next Round
 app.restartRound  = () =>  {
   document.getElementById("message").innerHTML = " "
 
@@ -270,13 +284,16 @@ app.restartRound  = () =>  {
   app.bounce = 0;
 
   //start at random x position
-  app.ball.position.set(0, 30, -150);
-  // app.ball.position.set(Math.random()*201-100, 30, -app.planeLength/2);
+  // app.ball.position.set(0, 30, -150);
+  app.ball.position.set(Math.random()*201-100, 30, -app.planeLength/2);
   app.paddleAI.position.x = app.ball.position.x;
   app.paddleAI.position.y = 30;
   app.paddleAI.rotation.x = 0;
   app.paddleAI.rotation.y = 0;
   // app.ball.velocity.set(0, 0, 1);
+
+  //?????????????????sleep 1 second?????????????????
+  // setTimeout(app.ball.velocity.set(0, 0, 1.3), 1000);
   app.ball.velocity.set(0, 0, 1.3);
   // app.ball.velocity.set(0, 0, 2);
 
@@ -435,8 +452,9 @@ app.matchScoreCheck = () => {
 
   } else if (app.humanScore >= app.winningScore) {
     app.winner = "human";
-    paddle = app.paddle
-    app.ball.velocity.set(0,0,0)
+    paddle = app.paddle;
+    app.ball.velocity.x = 0;
+    app.ball.velocity.z = 0;
     // write to the banner
     document.getElementById("scores").innerHTML = "Human player wins!";
     document.getElementById("message").innerHTML = "Press enter to play again";
@@ -467,92 +485,133 @@ app.matchScoreCheck = () => {
 
 app.calculateTableBounce = (ball, lastHitBy) => {
 
-    // Table bounce
-    //if hit the table, change y axis direction so the ball would go up
-    if( ball.position.y <= 2 && ball.velocity.y < 0 ){
-      ball.velocity.y *= -1;
-      // bounceMonitor(ball);
-      // bounce++;
+  // Table bounce
+  //if hit the table, change y axis direction so the ball would go up
+  if( ball.position.y <= 2 && ball.velocity.y < 0 ){
+    ball.velocity.y *= -1;
+    // bounceMonitor(ball);
+    // bounce++;
 
-      // Check if bounce is legal
+    // Check if bounce is legal
 
-      if (app.hasCrossedNet(ball, lastHitBy)) {
+    if (app.hasCrossedNet(ball, lastHitBy)) {
 
-        // ball is on opponent's side
-        if(app.hasBouncedOnOppositeSide){
-          // lost! second bounced
-          ball.velocity.x *= 0.2;
-          ball.velocity.z *= 0.2;
-          setTimeout(app.restartRound, 1500);
-        } else {
-          app.hasBouncedOnOppositeSide = true;
-        }
-        // if ball has bounced on your own side before crossing net
-      } else {
-        // ball is on our side
-        if (!app.justServed ) {
-          //if app.justServed is false - it's not first serve
-          //the ball also didn't cross the net
-          //illegal bounce
-          console.log(`illegal bounce by ${lastHitBy}`);
-          document.getElementById("message").innerHTML = "illegal bounce by " + lastHitBy
+      // ball is on opponent's side
+      if(app.hasBouncedOnOppositeSide){
+        //if opponent miss the ball
+        if (Math.abs(app.ball.position.z) > app.planeLength/2) {
+          document.getElementById("message").innerHTML = "Nice shot, " + lastHitBy + "!"
 
-
-          lastHitBy === "AI"? app.humanScore ++ : app.aiScore ++ ;
+          lastHitBy === "AI"? app.aiScore ++ : app.humanScore ++;
           document.getElementById("scores").innerHTML = app.aiScore + " - " + app.humanScore
-
-
-          ball.velocity.x *= 0.2;
-          ball.velocity.z *= 0.2;
+          // debugger;
           setTimeout(app.restartRound, 1000);
         }
-      };//end of Table bounce
 
-      if (!app.hasBouncedOnOppositeSide && app.hasCrossedNet(ball, lastHitBy)) {
-        console.log("DIDN'T bounce at all");
+        //double hit - won't happen as we will check illegal bounce a few lines later
+        // else {
+        //   // lost! second bounced
+        //   console.log("This is the first reset in calculateTableBounce method");
+        //   // setTimeout(app.restartRound, 2000);
+        //
+        //   // ball.velocity.x *= 0.2;
+        //   // ball.velocity.z *= 0.2;
+        //   ball.velocity.x = 0;
+        //   ball.velocity.z = 0;
+        //   document.getElementById("message").innerHTML = lastHitBy + " hit the table twice, lose 1 point";
+        //
+        //   //update score board
+        //   lastHitBy === "AI"? app.humanScore ++ : app.aiScore ++;
+        //   document.getElementById("scores").innerHTML = app.aiScore + " - " + app.humanScore
+        //   // debugger;
+        //   setTimeout(app.restartRound, 1000);
+        // }
+      } else {
+        app.hasBouncedOnOppositeSide = true;
+      };
+      //
+      // if (!app.hasBouncedOnOppositeSide) {
+      //   app.hasBouncedOnOppositeSide = true;
+      // }
+
+      // if ball has bounced on your own side before crossing net
+    } else {
+      // ball is on our side
+      if (!app.justServed ) {
+        //if app.justServed is false - it's not first serve
+        //the ball also didn't cross the net
+        //illegal bounce
+        console.log(`illegal bounce by ${lastHitBy}`);
+        document.getElementById("message").innerHTML = "illegal bounce by " + lastHitBy
+
+
+        lastHitBy === "AI"? app.humanScore ++ : app.aiScore ++ ;
+        document.getElementById("scores").innerHTML = app.aiScore + " - " + app.humanScore
+
+
+        ball.velocity.x *= 0.2;
+        ball.velocity.z *= 0.2;
+        setTimeout(app.restartRound, 1000);
       }
+    };//end of Table bounce
+  } else {
+    if (app.hasCrossedNet(ball, lastHitBy) && (app.ball.position.z < -app.planeLength/2 || Math.abs(app.ball.position.x) > app.planeWidth/2) && !app.hasBouncedOnOppositeSide && Math.abs(ball.velocity.z) > 0) {
+      console.log("DIDN'T bounce at all");
+      // ball.velocity.x *= 0.2;
+      // ball.velocity.z *= 0.2;
+
+      app.paddleAI.position.x = ball.position.x - 50;
+      app.paddleAI.position.y = ball.position.y - 50;
+      document.getElementById("message").innerHTML = lastHitBy + " out of control!"
+
+      lastHitBy === "AI"? app.humanScore ++ : app.aiScore ++ ;
+
+      document.getElementById("scores").innerHTML = app.aiScore + " - " + app.humanScore;
+
+      setTimeout(app.restartRound, 1000);
+
     }
+  }
 
-    // if never hit the Table
-    // if ( && ) {
-    //   // if ball didn't bounce on the table at all after hit
-    //   if (app.hasCrossedNet(ball, lastHitBy)) {
-    //     console.log("didn't bounce at all");
-    //     document.getElementById("message").innerHTML = "didn't bounce at all";
-    //     lastHitBy === "AI"? app.humanScore ++ : app.aiScore ++ ;
-    //     document.getElementById("scores").innerHTML = app.aiScore + " - " + app.humanScore
-    //
-    //     ball.velocity.set(0, 0, 0);
-    //     setTimeout(app.restartRound, 1000);
-    //   }
-    // }
-
-
-    // if (app.hasCrossedNet(ball, lastHitBy) === false && app.justServed === false) {
-    //   //if app.justServed is true - it's not first serve - illegal bounce
-    //   console.log(`illegal bounce by ${lastHitBy}`);
-    //   app.restartRound();
-    // }
+  // if never hit the Table
+  // if ( && ) {
+  //   // if ball didn't bounce on the table at all after hit
+  //   if (app.hasCrossedNet(ball, lastHitBy)) {
+  //     console.log("didn't bounce at all");
+  //     document.getElementById("message").innerHTML = "didn't bounce at all";
+  //     lastHitBy === "AI"? app.humanScore ++ : app.aiScore ++ ;
+  //     document.getElementById("scores").innerHTML = app.aiScore + " - " + app.humanScore
+  //
+  //     ball.velocity.set(0, 0, 0);
+  //     setTimeout(app.restartRound, 1000);
+  //   }
+  // }
 
 
+  // if (app.hasCrossedNet(ball, lastHitBy) === false && app.justServed === false) {
+  //   //if app.justServed is true - it's not first serve - illegal bounce
+  //   console.log(`illegal bounce by ${lastHitBy}`);
+  //   app.restartRound();
+  // }
 };
 
 
 app.calculateBallOutOfBounds = (ball) => {
   //if user missed the ball
-  if (ball.position.z >=200 & ball.velocity.z > 0){
-    console.log("You lose 1 point");
-    //stop ball
-    ball.velocity.x = 0;
-    ball.velocity.z = 0;
-    document.getElementById("message").innerHTML = "You lose 1 point";
-
-    //update score board
-    app.aiScore ++;
-    document.getElementById("scores").innerHTML = app.aiScore + " - " + app.humanScore
-    // debugger;
-    setTimeout(app.restartRound, 2000);
-  }
+  // ***********the codes below duplicates with calculateTableBounce method*****************
+  // if (ball.position.z >=200 & ball.velocity.z > 0){
+  //   console.log("You lose 1 point");
+  //   //stop ball
+  //   ball.velocity.x = 0;
+  //   ball.velocity.z = 0;
+  //   document.getElementById("message").innerHTML = "You lose 1 point";
+  //
+  //   //update score board
+  //   app.aiScore ++;
+  //   document.getElementById("scores").innerHTML = app.aiScore + " - " + app.humanScore
+  //   // debugger;
+  //   setTimeout(app.restartRound, 2000);
+  // }
 
   /* ALSO NEED TO CHECK:
      - if ball is too far off the side of the table (only when sideWalls are off)
@@ -562,16 +621,16 @@ app.calculateBallOutOfBounds = (ball) => {
   */
 
   //if ball is too far off the side of the table (only when sideWalls are off)
-  if (ball.position.x >= 200 || ball.position.x <= - 200){
-    console.log("too far off the side");
-    document.getElementById("message").innerHTML = "too far off the side"
-    setTimeout(app.restartRound, 2000);
-  }
+  // if (ball.position.x >= 200 || ball.position.x <= - 200){
+  //   console.log("too far off the side");
+  //   document.getElementById("message").innerHTML = "too far off the side"
+  //   setTimeout(app.restartRound, 2000);
+  // }
 
   // if ball has hit net
-  if ( Math.abs(ball.position.x) < app.planeWidth/2
-    && Math.abs(ball.position.y) < app.net.position.y - 2
-    && Math.abs(ball.position.z) < 2
+  if ( Math.abs(ball.position.x) <= app.planeWidth/2
+    && Math.abs(ball.position.y) <= app.net.position.y - 2
+    && Math.abs(ball.position.z) <= 2.5
     // these conditions avoid the ball 'jitter' of being
     // bounced back and forth within the net range
     &&  ((app.justHit === 'human' && ball.velocity.z < 0 )
@@ -622,7 +681,7 @@ app.calculatePaddlehit = (ball, paddle, paddleAI) => {
       app.justHit = "human"; // toggle the value for who just hit
       //to check if the ball has crossed the net
       app.hasBouncedOnOppositeSide = false;
-      ball.velocity.z += paddle.velocity.z * 0.005;
+      ball.velocity.z += paddle.velocity.z * app.config.humanHitVelocityScale;
 
       // Do the one-off AI decisions
       // console.log('UPDATE AI MOVE');
@@ -661,7 +720,7 @@ app.calculatePaddlehit = (ball, paddle, paddleAI) => {
       paddleAI.rotation.x = THREE.Math.mapLinear(
         ball.position.y,
         6, 80,
-        -Math.PI/12, Math.PI/8
+        -Math.PI/8, Math.PI/8
       )
       // DONE: fine tune this to be more accurate
       // paddleAI.rotation.y = (Math.random())*(-Math.PI/2) + Math.PI/4
@@ -686,7 +745,7 @@ app.calculatePaddlehit = (ball, paddle, paddleAI) => {
       ball.velocity.z = THREE.Math.mapLinear(
         paddleAI.rotation.x,
         -Math.PI/12, Math.PI/8,
-        1.8, 2.5
+        2, 2.5
       )
 
       // ball.velocity.z = 3;

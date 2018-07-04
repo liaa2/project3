@@ -15,8 +15,8 @@ app.guiControls = {
   rollDebug: '',
   ballVelocityScale: 1.5,
   gravity: 0.03,
-  sideWalls: true,
-  cheat: true,
+  sideWalls: false,
+  cheat: false,
   hasCrossed: false
 }
 
@@ -33,11 +33,13 @@ app.justServed = true;
 // app.aiBounce = 0;
 // app.humanBounce = 0;
 app.bounce = 0;
+//to check if the ball has bounced on the other side
 app.hasBouncedOnOppositeSide = false;
 
 app.config = {
   doBallUpdate: true,
-  aiXAngleOffset: -0.05  // upward tilt bias
+  aiXAngleOffset: -0.05,  // upward tilt bias
+  humanHitVelocityScale: 0.002
 }
 
 
@@ -62,7 +64,7 @@ app.init = () => {
   // app.scene.background = new THREE.Color( 0xffffff );
 
   app.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 )
-  app.camera.position.set( 0, 80, 200 );
+  app.camera.position.set( 0, 80, 250 );
   // camera.up = new THREE.Vector3(0,1,0);
   // camera.lookAt( scene.position );
 
@@ -308,7 +310,7 @@ app.init = () => {
       // Leap::Vector handSpeed = hand.palmVelocity(); -> The rate of change of the palm position in millimeters/second.
       handMesh.scenePosition(hand.palmPosition, app.paddle.position);
       app.paddle.position.z += 150;
-      app.paddle.position.x *= 2;
+      app.paddle.position.x *= 3;
 
       app.paddle.velocity = new THREE.Vector3(
         hand.palmVelocity[0],
@@ -322,19 +324,19 @@ app.init = () => {
           frame.hands[0].pitch(),
           -2, 2,
           // -Math.PI/4, Math.PI/4
-          -Math.PI/6, Math.PI/12
+          -Math.PI/3, Math.PI/4
         );
         // If this vector's x, y or z value is greater than/less than the max/min vector's x, y or z value, it is replaced by the corresponding value.
-        xAngleLM = THREE.Math.clamp(xAngleLM, -Math.PI/4, Math.PI/4);
+        xAngleLM = THREE.Math.clamp(xAngleLM, -Math.PI/3, Math.PI/4);
         app.paddle.rotation.x = xAngleLM;
       } else {
         let xAngleLM = THREE.Math.mapLinear(
           frame.hands[0].pitch(),
           -2, 2,
           // -Math.PI/4, Math.PI/4
-          -Math.PI/8, Math.PI/6
+          -Math.PI/4, Math.PI/6
         );
-        xAngleLM = THREE.Math.clamp(xAngleLM, -Math.PI/4, Math.PI/4);
+        xAngleLM = THREE.Math.clamp(xAngleLM, -Math.PI/4, Math.PI/6);
         app.paddle.rotation.x = xAngleLM;
       }
 
@@ -355,7 +357,7 @@ app.init = () => {
       //   Math.PI/4, -Math.PI/4  //min & max output
       // );
 
-      yAngleLM = THREE.Math.clamp(yAngleLM, -Math.PI/4, Math.PI/4);
+      yAngleLM = THREE.Math.clamp(yAngleLM, -Math.PI/5, Math.PI/5);
       // app.guiControls.rollDebug = angle;
       app.paddle.rotation.y = yAngleLM
 
@@ -417,8 +419,9 @@ document.addEventListener('keydown', ev => {
       // app.restartGame();
       app.newGame();
       break;
-    case "Tab":
-      app.ball.velocity.y *= -app.gravity;
-      break;
+    // case "Tab":
+    //   app.ball.velocity.y *= -app.gravity;
+    //   app.humanStart();
+    //   break;
   }
 });
