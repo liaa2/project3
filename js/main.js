@@ -6,9 +6,9 @@ var app = app || {};
 app.planeWidth = 200;
 app.planeLength = 300;
 app.paddleWidth = 12 * app.planeWidth/100;
-app.wallZ = 0; // - 150
+// app.wallZ = 0; // - 150
 // app.fingers = [];
-app.step = 0;
+// app.step = 0;
 app.guiControls = {
   // bouncingSpeed: 0.05,
   bouncingSpeed: 1.2,
@@ -20,6 +20,13 @@ app.guiControls = {
   hasCrossed: false
 }
 
+app.humanScore = 0;
+app.aiScore = 0;
+app.winningScore = 5;
+app.step = 0;
+app.winner = "";
+// let scoreBoard = document.getElementById("scoreBoard");
+// let message = document.getElementById("message");
 
 app.justHit = 'AI';
 app.justServed = true;
@@ -30,6 +37,7 @@ app.hasBouncedOnOppositeSide = false;
 
 app.config = {
   doBallUpdate: true,
+  aiXAngleOffset: -0.05  // upward tilt bias
 }
 
 
@@ -44,12 +52,14 @@ app.init = () => {
   app.gui.add(app.guiControls, "sideWalls");
   app.gui.add(app.guiControls, "cheat");
   app.gui.add(app.guiControls, "rollDebug").listen();
-  app.gui.add(app, "justHit").listen();
-  app.gui.add(app, "justServed").listen();
-  app.gui.add(app.guiControls, "hasCrossed").listen();
+  // app.gui.add(app, "justHit").listen();
+  // app.gui.add(app, "justServed").listen();
+  // app.gui.add(app.guiControls, "hasCrossed").listen();
+  app.gui.add(app.config, "aiXAngleOffset", -0.1, 0.1);// .listen();
 
   //set up 3D
   app.scene = new THREE.Scene()
+  // app.scene.background = new THREE.Color( 0xffffff );
 
   app.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 )
   app.camera.position.set( 0, 80, 200 );
@@ -57,7 +67,8 @@ app.init = () => {
   // camera.lookAt( scene.position );
 
   app.renderer = new THREE.WebGLRenderer({ antialias: true})
-
+  app.renderer.shadowMap.enabled = true;
+  app.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   //rotate camera
   app.controls = new THREE.OrbitControls( app.camera, app.renderer.domElement );
 
@@ -100,8 +111,13 @@ app.init = () => {
   app.scene.add(app.ambientLight);
 
   //Light - pointLight
-  app.pointLight = app.createPointlight();
-  app.scene.add(app.pointLight);
+  app.spotLightL = app.createSpotlight(-150, 100, 0, 0xffffff);
+  app.scene.add(app.spotLightL);
+  // app.spotLightR = app.createSpotlight(200, 100, 0, 0xffffff);
+  // app.scene.add(app.spotLightR);
+
+  // app.pointLight2 = app.createPointlight2();
+  // app.scene.add(app.pointLight2);
 
   //helper - (0,0,0) coordinates
   // app.helper = app.createHelper();
@@ -149,6 +165,7 @@ app.init = () => {
     const surfaceGeometry = new THREE.CircleGeometry(app.paddleWidth/4, 20);
     const surfaceMaterial = new THREE.MeshBasicMaterial({ color: 0x00FF00, side: THREE.DoubleSide });
     app.surfaceAI = new THREE.Mesh( surfaceGeometry, surfaceMaterial );
+    app.surfaceAI.visible = false;
     app.paddleAI.add( app.surfaceAI );
     app.paddleAI.updateMatrixWorld();
   };
@@ -175,6 +192,7 @@ app.init = () => {
     // const surfaceGeometry = new THREE.CircleBufferGeometry(app.paddleWidth/4, 8);
     const surfaceMaterial = new THREE.MeshBasicMaterial({ color: 0x00FF00, side: THREE.DoubleSide });
     app.surface = new THREE.Mesh( surfaceGeometry, surfaceMaterial );
+    app.surface.visible = false;
     // surface.geometry.computeFaceNormals();
     app.paddle.add( app.surface );
     // app.scene.add(app.surface);
@@ -366,8 +384,6 @@ app.init = () => {
     // offset: new THREE.Vector3(1000, 3090000, 120000),
     // materialOptions: {
     //   wireframe: true
-    // }
-
   })
 
   app.controller.connect();
@@ -391,14 +407,18 @@ app.onResize = () => {
 window.addEventListener('resize', app.onResize, false);
 
 document.addEventListener('keydown', ev => {
-  // console.log(ev.keyCode, ev.key);
+  console.log(ev.keyCode, ev.key);
   switch(ev.key){
     case ' ':
       app.config.doBallUpdate = !app.config.doBallUpdate;
       console.log(`Ball movement ${ app.config.doBallUpdate ? 'unpaused' : 'paused'}.`)
       break;
     case 'Enter':
-      app.restartGame();
+      // app.restartGame();
+      app.newGame();
+      break;
+    case "Tab":
+      app.ball.velocity.y *= -app.gravity;
       break;
   }
 });

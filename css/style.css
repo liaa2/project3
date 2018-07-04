@@ -1,0 +1,19 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+#container {
+  position: absolute;
+  color: white;
+  text-align: center;
+  margin-left: 42%;
+}
+
+#scoreboard {
+  /* display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center; */
+  font-size: 15px;
+}
