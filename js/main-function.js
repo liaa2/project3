@@ -315,8 +315,8 @@ app.restartRound  = () =>  {
     // Human is serving
     app.paddle.position.set(50, 30, 170);
     app.ball.position.set(0, 30, 140);
-    // app.ball.velocity.x = 0;
-    // app.ball.velocity.z = 0;
+    app.ball.velocity.x = 0;
+    app.ball.velocity.z = 0;
 
     // TODO: this code needs to run all the time (until serve is finished),
     // NOT just once inside this restartRound() function
@@ -707,6 +707,7 @@ app.calculateTableBounce = (ball, lastHitBy) => {
       // ball is on our side
       if( !app.justServed
         && app.pointHasBegun
+        && app.nextTurn === "AI"
       ){
         //if app.justServed is false - it's not first serve
         //the ball also didn't cross the net
