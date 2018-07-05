@@ -66,10 +66,10 @@ app.init = () => {
   app.gui.add(app.guiControls, "sideWalls");
   app.gui.add(app.guiControls, "cheat");
   app.gui.add(app.guiControls, "rollDebug").listen();
-  // app.gui.add(app, "justHit").listen();
-  // app.gui.add(app, "justServed").listen();
-  // app.gui.add(app.guiControls, "hasCrossed").listen();
-  app.gui.add(app.config, "aiXAngleOffset", -0.1, 0.1);// .listen();
+  app.gui.add(app, "justHit").listen();
+  app.gui.add(app, "justServed").listen();
+  app.gui.add(app.guiControls, "hasCrossed").listen();
+  // app.gui.add(app.config, "aiXAngleOffset", -0.1, 0.1);// .listen();
 
   //set up 3D
   app.scene = new THREE.Scene()
