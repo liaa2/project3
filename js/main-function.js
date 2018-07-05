@@ -240,6 +240,7 @@ app.humanStart = () => {
     app.ball.velocity.z = app.paddle.velocity.z * app.config.humanHitVelocityScale;
     app.winner = "";
     app.pointHasBegun = true;
+    app.justServed = false;
   }
 };
 
@@ -253,9 +254,11 @@ app.newGame = () => {
 
   // app.particleSystem.visible = false;
   // app.particleSystem.stop();
-  app.scene.remove(app.particleSystem);
-  app.particleSystem.geometry.dispose();
-  app.particleSystem.material.dispose();
+  if (app.particleSystem) {
+    app.particleSystem.geometry.dispose();
+    app.particleSystem.material.dispose();
+    app.scene.remove(app.particleSystem);
+  }
   app.cheering.pause();
 
   if( app.winner === "AI" ){
@@ -300,7 +303,7 @@ app.restartRound  = () =>  {
   app.paddleAI.position.y = 30;
 
   // AI is serving
-  if (app.nextTurn === "AI") {
+  // if (app.nextTurn === "AI") {
     app.ball.position.set(Math.random()*201-100, 30, -app.planeLength/2);
     app.paddleAI.position.x = app.ball.position.x;
     // app.ball.velocity.set(0, 0, 1);
@@ -311,24 +314,32 @@ app.restartRound  = () =>  {
     // app.ball.velocity.set(0, 0, 2);
 
     app.justHit = "AI";  // reset last-hit tracker
-  } else {
-    // Human is serving
-    app.paddle.position.set(50, 30, 170);
-    app.ball.position.set(0, 30, 140);
-    app.ball.velocity.x = 0;
-    app.ball.velocity.z = 0;
+    // } else {
+    //   // Human is serving
+    //   app.paddle.position.set(50, 30, 170);
+    //   // app.ball.position.set(0, 30, 135);
+    //   app.ball.position.set(0, 30, 150);
+    //   // app.ball.velocity.x = 0;
+    //   // app.ball.velocity.z = 0;
+    //
+    //   if (app.withinBounceRange(app.ball, app.paddle) && (app.paddle.position.z - app.ball.position.z) < 3) {
+    //     app.ball.velocity.z = app.paddle.velocity.z * app.config.humanHitVelocityScale;
+    //     app.justHit = "human";
+    //     app.pointHasBegun = true;
+    //     console.warn('SERVE DETECTED from inside restartRound()');
+    //   }
 
     // TODO: this code needs to run all the time (until serve is finished),
     // NOT just once inside this restartRound() function
-    if (app.withinBounceRange(app.ball, app.paddle) && (app.paddle.position.z - app.ball.position.z) < 4) {
-      // Ball is served! (hit)
-      app.humanPaddleSound.play();
-      app.ball.velocity.z = app.paddle.velocity.z * app.config.humanHitVelocityScale;
-      app.justHit = "human";
-      app.pointHasBegun = true;
-      console.warn('SERVE DETECTED from inside restartRound()');
-    }
-  }
+    // if (app.withinBounceRange(app.ball, app.paddle) && (app.paddle.position.z - app.ball.position.z) < 4) {
+    //   // Ball is served! (hit)
+    //   app.humanPaddleSound.play();
+    //   app.ball.velocity.z = app.paddle.velocity.z * app.config.humanHitVelocityScale;
+    //   app.justHit = "human";
+    //   app.pointHasBegun = true;
+    //   console.warn('SERVE DETECTED from inside restartRound()');
+    // }
+    // }
   //initial serve
   app.justServed = true;
   app.hasBouncedOnOppositeSide = false;
@@ -564,9 +575,7 @@ app.matchScoreCheck = () => {
     app.nextTurn = "human";
     app.aiScore = app.winningScore;
     paddle = app.paddleAI;
-    app.ball.velocity.x = 0;
-    app.ball.velocity.y = 0;
-    app.ball.velocity.z = 0;
+    app.ball.velocity.set(0,0,0);
     app.ball.position.set(0,2,-app.planeLength/2)
     // write to the banner
     document.getElementById("scores").innerHTML = "AI wins!";
@@ -593,9 +602,7 @@ app.matchScoreCheck = () => {
     app.nextTurn = "AI";
     app.humanScore = app.winningScore;
     paddle = app.paddle;
-    app.ball.velocity.x = 0;
-    app.ball.velocity.y = 0;
-    app.ball.velocity.z = 0;
+    app.ball.velocity.set(0,0,0);
     app.ball.position.set(0, 2, app.planeLength/2)
     // write to the banner
     document.getElementById("scores").innerHTML = "Human wins!";
@@ -675,39 +682,16 @@ app.calculateTableBounce = (ball, lastHitBy) => {
           // setTimeout(app.restartRound, 1000);
           setTimeout(app.restartRound, 1000);
         }
-
-        //double hit - won't happen as we will check illegal bounce a few lines later
-        // else {
-        //   // lost! second bounced
-        //   console.log("This is the first reset in calculateTableBounce method");
-        //   // setTimeout(app.restartRound, 2000);
-        //
-        //   // ball.velocity.x *= 0.2;
-        //   // ball.velocity.z *= 0.2;
-        //   ball.velocity.x = 0;
-        //   ball.velocity.z = 0;
-        //   document.getElementById("message").innerHTML = lastHitBy + " hit the table twice, lose 1 point";
-        //
-        //   //update score board
-        //   lastHitBy === "AI"? app.humanScore ++ : app.aiScore ++;
-        //   document.getElementById("scores").innerHTML = app.aiScore + " - " + app.humanScore
-        //   // debugger;
-        //   setTimeout(app.restartRound, 1000);
-        // }
       } else {
         app.hasBouncedOnOppositeSide = true;
       };
-      //
-      // if (!app.hasBouncedOnOppositeSide) {
-      //   app.hasBouncedOnOppositeSide = true;
-      // }
 
       // if ball has bounced on your own side before crossing net
     } else {
       // ball is on our side
       if( !app.justServed
-        && app.pointHasBegun
-        && app.nextTurn === "AI"
+        // && app.pointHasBegun
+        // && app.nextTurn === "AI"
       ){
         //if app.justServed is false - it's not first serve
         //the ball also didn't cross the net
@@ -735,7 +719,7 @@ app.calculateTableBounce = (ball, lastHitBy) => {
   } else {
     // No bounce
 
-    if (app.hasCrossedNet(ball, lastHitBy) && (app.ball.position.z < -app.planeLength/2 || Math.abs(app.ball.position.x) > app.planeWidth/2) && !app.hasBouncedOnOppositeSide && Math.abs(ball.velocity.z) > 0) {
+    if (app.hasCrossedNet(ball, lastHitBy) && (Math.abs(app.ball.position.z) > app.planeLength/2 || Math.abs(app.ball.position.x) > app.planeWidth/2) && !app.hasBouncedOnOppositeSide && Math.abs(ball.velocity.z) > 0) {
       // console.log("DIDN'T bounce at all");
       // ball.velocity.x *= 0.2;
       // ball.velocity.z *= 0.2;
@@ -746,8 +730,8 @@ app.calculateTableBounce = (ball, lastHitBy) => {
 
       app.paddleAI.position.x = ball.position.x - 50;
       app.paddleAI.position.y = ball.position.y - 50;
-      console.log(`${lastHitBy} out of control`);
-      document.getElementById("message").innerHTML = lastHitBy + " out of control!"
+      console.log(`${lastHitBy} out`);
+      document.getElementById("message").innerHTML = lastHitBy + " out!"
 
       if (app.addPoint) {
         app.updateScores(lastHitBy);
@@ -919,23 +903,23 @@ app.calculatePaddlehit = (ball, paddle, paddleAI) => {
       )
       // DONE: fine tune this to be more accurate
       // paddleAI.rotation.y = (Math.random())*(-Math.PI/2) + Math.PI/4
-      // paddleAI.rotation.y = THREE.Math.randFloat(Math.PI/15, -Math.PI/15);
+      paddleAI.rotation.y = THREE.Math.randFloat(Math.PI/15, -Math.PI/15);
 
-      if (app.ball.position.x >= 0 &&  app.ball.position.x < app.planeWidth/2 + 100) {
-        paddleAI.rotation.y = THREE.Math.mapLinear(
-          ball.position.x,
-          0, app.planeWidth/2 + 50,
-          0, - Math.PI/4
-        )
-        paddleAI.rotation.y = THREE.Math.clamp(paddleAI.rotation.y, 0, - Math.PI/4);
-      } else if (app.ball.position.x < 0 && app.ball.position.x > -app.planeWidth/2 - 100) {
-        paddleAI.rotation.y = THREE.Math.mapLinear(
-          ball.position.x,
-          -app.planeWidth/2 - 50, 0,
-          Math.PI/4, 0
-        )
-        paddleAI.rotation.y = THREE.Math.clamp(paddleAI.rotation.y, Math.PI/4, 0);
-      };
+      // if (app.ball.position.x >= 0 &&  app.ball.position.x < app.planeWidth/2 + 100) {
+      //   paddleAI.rotation.y = THREE.Math.mapLinear(
+      //     ball.position.x,
+      //     0, app.planeWidth/2 + 50,
+      //     0, - Math.PI/4
+      //   )
+      //   paddleAI.rotation.y = THREE.Math.clamp(paddleAI.rotation.y, 0, - Math.PI/4);
+      // } else if (app.ball.position.x < 0 && app.ball.position.x > -app.planeWidth/2 - 100) {
+      //   paddleAI.rotation.y = THREE.Math.mapLinear(
+      //     ball.position.x,
+      //     -app.planeWidth/2 - 50, 0,
+      //     Math.PI/4, 0
+      //   )
+      //   paddleAI.rotation.y = THREE.Math.clamp(paddleAI.rotation.y, Math.PI/4, 0);
+      // };
 
       // ball.velocity.multiplyScalar(-1)
       ball.velocity.reflect( normalizedNormal );
