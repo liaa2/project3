@@ -17,7 +17,10 @@ app.guiControls = {
   gravity: 0.03,
   sideWalls: false,
   cheat: false,
-  hasCrossed: false
+  hasCrossed: false,
+  numParticles: 50,
+  particleDistribution: 800,
+  particleVelocityScale: 1.0
 }
 
 app.humanScore = 0;
@@ -25,22 +28,30 @@ app.aiScore = 0;
 app.winningScore = 5;
 app.step = 0;
 app.winner = "";
-// let scoreBoard = document.getElementById("scoreBoard");
-// let message = document.getElementById("message");
+app.nextTurn = "AI";
+app.pointHasBegun = false;
 
 app.justHit = 'AI';
 app.justServed = true;
-// app.aiBounce = 0;
-// app.humanBounce = 0;
 app.bounce = 0;
 //to check if the ball has bounced on the other side
 app.hasBouncedOnOppositeSide = false;
+app.activeParticle = true;
+app.addPoint = true;
 
 app.config = {
   doBallUpdate: true,
   aiXAngleOffset: -0.05,  // upward tilt bias
   humanHitVelocityScale: 0.002
 }
+
+
+//audio setting
+app.humanPaddleSound = new Audio("../audio/paddle1.mp3");
+app.aiPaddleSound = new Audio("../audio/paddle2.mp3");
+app.humanSide = new Audio("../audio/pong1.mp3");
+app.aiSide = new Audio("../audio/pong2.mp3");
+app.cheering = new Audio("../audio/cheering.mp3");
 
 
 app.init = () => {
@@ -51,6 +62,7 @@ app.init = () => {
   app.gui.add(app.guiControls, "bouncingSpeed", 0, 2);
   app.gui.add(app.guiControls, "ballVelocityScale", 0, 3);
   app.gui.add(app.guiControls, "gravity", 0, 0.05);
+  app.gui.add(app.guiControls, "particleVelocityScale", -2, 2);
   app.gui.add(app.guiControls, "sideWalls");
   app.gui.add(app.guiControls, "cheat");
   app.gui.add(app.guiControls, "rollDebug").listen();
@@ -64,7 +76,7 @@ app.init = () => {
   // app.scene.background = new THREE.Color( 0xffffff );
 
   app.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 )
-  app.camera.position.set( 0, 80, 250 );
+  app.camera.position.set( 0, 80, 280 );
   // camera.up = new THREE.Vector3(0,1,0);
   // camera.lookAt( scene.position );
 
@@ -117,6 +129,9 @@ app.init = () => {
   app.scene.add(app.spotLightL);
   // app.spotLightR = app.createSpotlight(200, 100, 0, 0xffffff);
   // app.scene.add(app.spotLightR);
+
+  // app.particleSystem = app.createParticleSystem();
+  // app.scene.add(app.particleSystem);
 
   // app.pointLight2 = app.createPointlight2();
   // app.scene.add(app.pointLight2);
@@ -310,7 +325,7 @@ app.init = () => {
       // Leap::Vector handSpeed = hand.palmVelocity(); -> The rate of change of the palm position in millimeters/second.
       handMesh.scenePosition(hand.palmPosition, app.paddle.position);
       app.paddle.position.z += 150;
-      app.paddle.position.x *= 3;
+      app.paddle.position.x *= 3.5;
 
       app.paddle.velocity = new THREE.Vector3(
         hand.palmVelocity[0],
@@ -319,7 +334,7 @@ app.init = () => {
       );
 
       //using pitch() - hand rotation along x axis:
-      if (app.paddle.position.y > 45) {
+      if (app.paddle.position.y > 40) {
         let xAngleLM = THREE.Math.mapLinear(
           frame.hands[0].pitch(),
           -2, 2,
@@ -348,7 +363,7 @@ app.init = () => {
       let yAngleLM = THREE.Math.mapLinear(
         frame.hands[0].roll(),   //value to map
         -2, 2,   //min & max input range
-        Math.PI/5, -Math.PI/5  //min & max output
+        Math.PI/3, -Math.PI/3  //min & max output
       );
       // app.guiControls.rollDebug = frame.hands[0].pitch() ;
       // let angle = THREE.Math.mapLinear(
@@ -357,7 +372,7 @@ app.init = () => {
       //   Math.PI/4, -Math.PI/4  //min & max output
       // );
 
-      yAngleLM = THREE.Math.clamp(yAngleLM, -Math.PI/5, Math.PI/5);
+      yAngleLM = THREE.Math.clamp(yAngleLM, -Math.PI/3, Math.PI/3);
       // app.guiControls.rollDebug = angle;
       app.paddle.rotation.y = yAngleLM
 
@@ -419,9 +434,8 @@ document.addEventListener('keydown', ev => {
       // app.restartGame();
       app.newGame();
       break;
-    // case "Tab":
-    //   app.ball.velocity.y *= -app.gravity;
-    //   app.humanStart();
-    //   break;
+    case "Tab":
+      app.aiScore = app.winningScore;
+      break;
   }
 });
