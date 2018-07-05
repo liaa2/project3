@@ -16,7 +16,7 @@ app.guiControls = {
   ballVelocityScale: 1.5,
   gravity: 0.03,
   sideWalls: false,
-  cheat: false,
+  easyMode: false,
   hasCrossed: false,
   numParticles: 50,
   particleDistribution: 800,
@@ -29,6 +29,7 @@ app.winningScore = 5;
 app.step = 0;
 app.winner = "";
 app.nextTurn = "AI";
+//only if human turn to serve - check if human has served
 app.pointHasBegun = false;
 
 app.justHit = 'AI';
@@ -59,12 +60,12 @@ app.init = () => {
 
   app.gui = new dat.GUI();
   // app.gui.add(app.guiControls, "bouncingSpeed", 0, 1);
-  app.gui.add(app.guiControls, "bouncingSpeed", 0, 2);
-  app.gui.add(app.guiControls, "ballVelocityScale", 0, 3);
-  app.gui.add(app.guiControls, "gravity", 0, 0.05);
-  app.gui.add(app.guiControls, "particleVelocityScale", -2, 2);
-  app.gui.add(app.guiControls, "sideWalls");
-  app.gui.add(app.guiControls, "cheat");
+  // app.gui.add(app.guiControls, "bouncingSpeed", 0, 2);
+  // app.gui.add(app.guiControls, "ballVelocityScale", 0, 3);
+  // app.gui.add(app.guiControls, "gravity", 0, 0.05);
+  // app.gui.add(app.guiControls, "particleVelocityScale", -2, 2);
+  // app.gui.add(app.guiControls, "sideWalls");
+  app.gui.add(app.guiControls, "easyMode");
   app.gui.add(app.guiControls, "rollDebug").listen();
   app.gui.add(app, "justHit").listen();
   app.gui.add(app, "justServed").listen();
@@ -436,6 +437,7 @@ document.addEventListener('keydown', ev => {
       break;
     case "Tab":
       app.aiScore = app.winningScore;
+      app.humanStart();
       break;
   }
 });

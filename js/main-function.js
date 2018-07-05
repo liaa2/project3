@@ -13,183 +13,23 @@ TODO:
   - return more balls (better angle, over the net more)
 
 */
-// app.AI = {
-//   doneAdjustments: true
-// };
-// app.human = {
-//   justHit: false
-// };
-
-
-
-// app.updateJustHit = () => {
-//   app.justHit = app.justHit === 'AI' ? 'human' : 'AI';
-//   app.guiControls.rollDebug = app.justHit;
-// }
-
-//create table surface
-// app.createPlane = () => {
-//   var planeMaterial = new THREE.MeshLambertMaterial({ color: 0x3080C9 });
-//   // let planeWidth = 150;
-//   // let planeLength = 300;
-//   var planeGeometry = new THREE.PlaneGeometry(app.planeWidth, app.planeLength, 30)
-//   // create the surface
-//   var plane = new THREE.Mesh(planeGeometry, planeMaterial);
-//   plane.rotation.x = -0.5 * Math.PI;
-//   plane.receiveShadow = true;
-//
-//   return plane;
-// };
-//
-// //create net
-// app.createNet = () => {
-//
-//
-//   var netGeometry = new THREE.PlaneGeometry( app.planeWidth, 12);
-//   var netMaterial = new THREE.MeshBasicMaterial( {
-//     color: 0xffffff,
-//     side: THREE.DoubleSide,
-//   } );
-//
-//   var textureLoader = new THREE.TextureLoader(); //.load('img/net1.jpg');
-//   textureLoader.load('img/net22.jpg', (texture) => {
-//     texture.wrapS = THREE.RepeatWrapping;
-//     texture.wrapT = THREE.RepeatWrapping;
-//     texture.repeat.set(15, 1);
-//     netMaterial.map = texture;
-//   });
-//
-//
-//   var net = new THREE.Mesh(netGeometry, netMaterial);
-//   net.position.y = 6;
-//   return net;
-// }
-//
-// app.createLine = () => {
-//   var lineGeometry = new THREE.PlaneGeometry( 1, app.planeLength);
-//   var lineMaterial = new THREE.MeshBasicMaterial( {
-//     color: 0xffffff,
-//     side: THREE.DoubleSide,
-//   } );
-//   var line = new THREE.Mesh(lineGeometry, lineMaterial);
-//   line.position.set(0,0.2,0)
-//   line.rotation.x = -0.5 * Math.PI;
-//   return line;
-// }
-//
-// app.createUpLine = () => {
-//   var lineGeometry = new THREE.PlaneGeometry( 1, app.planeWidth);
-//   var lineMaterial = new THREE.MeshBasicMaterial( {
-//     color: 0xffffff,
-//     side: THREE.DoubleSide,
-//   } );
-//   var upLine = new THREE.Mesh(lineGeometry, lineMaterial);
-//   upLine.position.set(0,0.2,-app.planeLength/2+0.5);
-//   upLine.rotation.z = -0.5 * Math.PI;
-//   upLine.rotation.x = 0.5 * Math.PI;
-//   return upLine;
-// }
-//
-// app.createDownLine = () => {
-//   var lineGeometry = new THREE.PlaneGeometry( 1, app.planeWidth);
-//   var lineMaterial = new THREE.MeshBasicMaterial( {
-//     color: 0xffffff,
-//     side: THREE.DoubleSide,
-//   } );
-//   var downLine = new THREE.Mesh(lineGeometry, lineMaterial);
-//   downLine.position.set(0,0.2,app.planeLength/2-0.5)
-//   downLine.rotation.z = -0.5 * Math.PI;
-//   downLine.rotation.x = 0.5 * Math.PI;
-//   return downLine;
-// }
-//
-// app.createLeftLine = () => {
-//   var lineGeometry = new THREE.PlaneGeometry( 1, app.planeLength);
-//   var lineMaterial = new THREE.MeshBasicMaterial( {
-//     color: 0xffffff,
-//     side: THREE.DoubleSide,
-//   } );
-//   var leftLine = new THREE.Mesh(lineGeometry, lineMaterial);
-//   leftLine.position.set(-app.planeWidth/2+0.5,0.2,0)
-//   leftLine.rotation.x = -0.5 * Math.PI;
-//   return leftLine;
-// }
-//
-// app.createRightLine = () => {
-//   var lineGeometry = new THREE.PlaneGeometry( 1, app.planeLength);
-//   var lineMaterial = new THREE.MeshBasicMaterial( {
-//     color: 0xffffff,
-//     side: THREE.DoubleSide,
-//   } );
-//   var rightLine = new THREE.Mesh(lineGeometry, lineMaterial);
-//   rightLine.position.set(app.planeWidth/2-0.5,0.2,0)
-//   rightLine.rotation.x = -0.5 * Math.PI;
-//   return rightLine;
-// }
-//
-// //create ping pong ball
-// app.createBall = () => {
-//   var geometry = new THREE.SphereGeometry( 2, 30, 30)
-//   var material = new THREE.MeshStandardMaterial( { color: 0xffd046 })
-//   var sphere = new THREE.Mesh( geometry, material )
-//   sphere.castShadow = true;
-//   sphere.position.set(0, 30, -120); //-140);
-//   sphere.velocity = new THREE.Vector3(0, 0, 1);
-//
-//   return sphere;
-// };
-//
-// //create lights
-// app.createAmbientlight = () => {
-//   var ambientLight = new THREE.AmbientLight (0xffffff, 0.4);
-//   return ambientLight;
-// }
-//
-// app.createSpotlight = (x, y, z , color, intensity=1.0) => {
-//   var spotLight = new THREE.SpotLight(color, intensity); //, 200, Math.PI/8, 1, 0  );
-//   spotLight.position.set(x,y,z);
-//   // spotLight.penumbra = 0.2;
-//   // spotLight.power = 0.5;
-//   // spotLight.angle = Math.PI/4;
-//   spotLight.castShadow = true;
-//   spotLight.shadow.mapSize.width = 1024;
-//   spotLight.shadow.mapSize.height = 1024;
-//
-//   // var helper = new THREE.SpotLightHelper(spotLight);
-//   // app.scene.add(helper);
-//   return spotLight;
-// }
-
-//create axes helper
-// app.createHelper = () => {
-//   var helper = new THREE.AxesHelper( 10 );
-//   return helper
-// }
-
-
-
 
 //animation
 app.animate = () => {
-  // app.paddleHelper.update();
 
   app.humanStart();
 
-  app.cheat();
+  app.easyMode();
 
   app.updateAI();
 
   if(app.config.doBallUpdate){
      app.updateBall();
-   }
+  }
 
   app.stats.update();
 
-  // if(!app.winner){
-  // if (app.matchScoreCheck()) {
-    app.matchScoreCheck();
-  // }
-  // }
+  app.matchScoreCheck();
 
   if (app.particleSystem) {
     app.animateParticles();
@@ -197,7 +37,7 @@ app.animate = () => {
 
   app.renderer.render( app.scene, app.camera );
   requestAnimationFrame(app.animate);
-}
+};
 
 
 //add Stats
@@ -216,95 +56,95 @@ app.addStats = () => {
 
 //AI paddle moves
 app.updateAI = () => {
-
   // try to match ball X position as soon as it's moving in direction of AI player
   if (app.ball.velocity.z < 0 ){
     app.paddleAI.position.x = app.ball.position.x;
     app.paddleAI.position.y = app.ball.position.y;
-
-    // Choose a random rotation when the ball is close enough
-    // console.log(app.paddleAI.z, app.ball.position.z, (app.paddleAI.z - app.ball.position.z));
-
   }
-  // else {
-  //   app.paddleAI.position.x = 0;
-  //   app.paddleAI.rotation.x = 0;
-  //   app.paddleAI.rotation.y = 0;
-  // }
 }
 
 
 //human turn to hit the ball and start the game
 app.humanStart = () => {
-  if (app.winner==="AI" && app.withinBounceRange(app.ball, app.paddle) && (app.paddle.position.z - app.ball.position.z) < 3) {
-    app.ball.velocity.z = app.paddle.velocity.z * app.config.humanHitVelocityScale;
+  if (app.winner === "AI" && app.withinBounceRange(app.ball, app.paddle) && (app.paddle.position.z - app.ball.position.z) < 3 && app.ball.velocity.z === 0) {
+    app.ball.velocity.z = app.paddle.velocity.z * app.config.humanHitVelocityScale ;
     app.winner = "";
+    app.justHit = "human";
+    // debugger;
     app.pointHasBegun = true;
-    app.justServed = false;
   }
 };
 
+app.setting = () => {
+  app.paddleAI.rotation.x = 0;
+  app.paddleAI.rotation.y = 0;
+  app.justServed = true;
+  app.hasBouncedOnOppositeSide = false;
+  app.addPoint = true;
+  app.bounce = 0;
+}
 
 app.newGame = () => {
   // console.log('here');
   document.getElementById("scores").innerHTML = "0 - 0";
   document.getElementById("message").innerHTML = "First to " + app.winningScore + " scores wins!";
 
-  console.log('reset particles');
+  // console.log('reset particles');
 
-  // app.particleSystem.visible = false;
-  // app.particleSystem.stop();
   if (app.particleSystem) {
     app.particleSystem.geometry.dispose();
     app.particleSystem.material.dispose();
     app.scene.remove(app.particleSystem);
   }
+
   app.cheering.pause();
 
   if( app.winner === "AI" ){
     // human starts
     app.ball.position.set(0, 30, 150);
+    // app.humanStart();
   } else {
     app.ball.position.set(0, 30, -150);
     app.ball.velocity.set(0, 0, 1.3);
     app.winner = "";
   }
-  app.paddleAI.rotation.x = 0;
-  app.paddleAI.rotation.y = 0;
+
+  app.setting();
+  // app.paddleAI.rotation.x = 0;
+  // app.paddleAI.rotation.y = 0;
   app.paddle.rotation.x = 0;
   app.paddle.rotation.y = 0;
   const scale = app.planeWidth/100;
   app.paddle.scale.set(scale, scale, scale);
   app.paddleAI.scale.set(scale, scale, scale);
 
-  // app.winner = "";
-  app.bounce = 0;
+  // app.bounce = 0;
   app.aiScore = 0;
   app.humanScore = 0;
   // app.justHit = "AI";
-  app.justServed = true;
-  app.hasBouncedOnOppositeSide = false;
-  app.addPoint = true;
+  // app.justServed = true;
+  // app.hasBouncedOnOppositeSide = false;
+  // app.addPoint = true;
   app.activeParticle = true;
 }
 
 
-//Next Round
+//Next Point
 app.restartRound  = () =>  {
   document.getElementById("message").innerHTML = " "
-  // app.aiBounce = 0;
-  // app.humanBounce = 0;
-  app.bounce = 0;
+  // app.bounce = 0;
 
   //start at random x position
   // app.ball.position.set(0, 30, -150);
-  app.paddleAI.rotation.x = 0;
-  app.paddleAI.rotation.y = 0;
+  // app.paddleAI.rotation.x = 0;
+  // app.paddleAI.rotation.y = 0;
+
+  app.setting();
   app.paddleAI.position.y = 30;
 
   // AI is serving
   // if (app.nextTurn === "AI") {
-    app.ball.position.set(Math.random()*201-100, 30, -app.planeLength/2);
+    app.ball.position.set(Math.random()*101-50, 30, -app.planeLength/2);
     app.paddleAI.position.x = app.ball.position.x;
     // app.ball.velocity.set(0, 0, 1);
 
@@ -341,9 +181,9 @@ app.restartRound  = () =>  {
     // }
     // }
   //initial serve
-  app.justServed = true;
-  app.hasBouncedOnOppositeSide = false;
-  app.addPoint = true;
+  // app.justServed = true;
+  // app.hasBouncedOnOppositeSide = false;
+  // app.addPoint = true;
 };
 
 //Ping pong ball moves
@@ -466,16 +306,16 @@ app.updateBall = () => {
   // }
 };
 
-///CHEATING!!!!!!!!!!!!!!---->>>>>>>>>><<<<<<<<<<<-------!!!!!!!!!!!!
-app.cheat = () => {
-  if (app.guiControls.cheat && app.ball.velocity.z > 0 ) {
+//easy mode to help user find ball position (x axis and y axis)
+app.easyMode = () => {
+  if (app.guiControls.easyMode && app.ball.velocity.z > 0 ) {
     app.paddle.position.x = app.ball.position.x
     app.paddle.position.y = app.ball.position.y
   }
 }
 
 
-
+//create, animate and add particle System to the scene
 app.createParticleSystem = () => {
 
   const particles = new THREE.Geometry();
@@ -553,20 +393,17 @@ app.animateParticles = () => {
   app.particleSystem.geometry.verticesNeedUpdate = true;
 }
 
-
-
-//counting scores//////////////////////////
-
 app.showParticleSystem = () => {
   if (app.winner && app.activeParticle) {
-    console.log("show Particle System");
+    // console.log("show Particle System");
     app.particleSystem = app.createParticleSystem();
     app.scene.add(app.particleSystem);
     app.activeParticle = false;
   }
-}
+};
 
 
+//check winning condition
 app.matchScoreCheck = () => {
   let paddle;
   // if either one reaches 5 points
@@ -637,13 +474,16 @@ app.matchScoreCheck = () => {
   // }
 };
 
+
+//update scores helper method
 app.updateScores = () => {
   app.justHit === "AI"? app.humanScore ++ : app.aiScore ++ ;
   document.getElementById("scores").innerHTML = app.aiScore + " - " + app.humanScore;
-  console.log('updateScores()');
+  // console.log('updateScores()');
 
   setTimeout(app.restartRound, 1000);
 }
+
 
 app.calculateTableBounce = (ball, lastHitBy) => {
 
@@ -651,17 +491,17 @@ app.calculateTableBounce = (ball, lastHitBy) => {
   //if hit the table, change y axis direction so the ball would go up
   if( ball.position.y <= 2 && ball.velocity.y < 0 ){
     ball.velocity.y *= -1;
-    // bounceMonitor(ball);
-    // bounce++;
 
+    //toggle the sound based on ball on which side
     if (Math.abs(ball.position.x) <= app.planeWidth/2 && Math.abs(ball.position.z) <= app.planeLength/2 && ball.position.y >= 0) {
       ball.position.z <= 0 ?
       app.aiSide.play() : app.humanSide.play()
     }
-    // Check if bounce is legal
 
+    // Check if bounce is legal
+    // ball has crossed the net by the person
     if (app.hasCrossedNet(ball, lastHitBy)) {
-      // ball is on opponent's side
+      //if ball has bounced on the other side
       if(app.hasBouncedOnOppositeSide){
         //if opponent miss the ball
         if (Math.abs(app.ball.position.z) > app.planeLength/2) {
@@ -679,47 +519,45 @@ app.calculateTableBounce = (ball, lastHitBy) => {
             app.addPoint = false;
           }
           // debugger;
-          // setTimeout(app.restartRound, 1000);
           setTimeout(app.restartRound, 1000);
         }
+        //ball hasn't bounce on the other side - first time bounce on the other side
       } else {
         app.hasBouncedOnOppositeSide = true;
       };
 
       // if ball has bounced on your own side before crossing net
     } else {
-      // ball is on our side
+      //if app.justServed is false - it's not the first serve
       if( !app.justServed
-        // && app.pointHasBegun
+        //if app.pointHasBegun is false - this is not human's first serve
+        && app.pointHasBegun === false
         // && app.nextTurn === "AI"
       ){
-        //if app.justServed is false - it's not first serve
         //the ball also didn't cross the net
         //illegal bounce
         console.log(`illegal bounce by ${lastHitBy}`);
-        document.getElementById("message").innerHTML = "illegal bounce by " + lastHitBy
+        document.getElementById("message").innerHTML = "illegal bounce by " + lastHitBy;
 
         ball.velocity.x *= 0.2;
         ball.velocity.z *= 0.2;
 
 
-        console.log('addPoint', app.addPoint);
+        // console.log('addPoint', app.addPoint);
         if (app.addPoint) {
           app.updateScores(lastHitBy);
           app.addPoint = false;
         }
-        // lastHitBy === "AI"? app.humanScore ++ : app.aiScore ++ ;
-        // document.getElementById("scores").innerHTML = app.aiScore + " - " + app.humanScore
-        //
-        //
-        // setTimeout(app.restartRound, 1000);
+
       }
+      //change the point has begun to false after human first serve to activate the illegal bounce condition
+      app.pointHasBegun = false;
     } //end else of hasCrossedNet
 
   } else {
     // No bounce
 
-    if (app.hasCrossedNet(ball, lastHitBy) && (Math.abs(app.ball.position.z) > app.planeLength/2 || Math.abs(app.ball.position.x) > app.planeWidth/2) && !app.hasBouncedOnOppositeSide && Math.abs(ball.velocity.z) > 0) {
+    if (app.hasCrossedNet(ball, lastHitBy) && (Math.abs(app.ball.position.z) > app.planeLength/2+10 || Math.abs(app.ball.position.x) > app.planeWidth/2+10) && !app.hasBouncedOnOppositeSide && Math.abs(ball.velocity.z) > 0) {
       // console.log("DIDN'T bounce at all");
       // ball.velocity.x *= 0.2;
       // ball.velocity.z *= 0.2;
@@ -737,35 +575,8 @@ app.calculateTableBounce = (ball, lastHitBy) => {
         app.updateScores(lastHitBy);
         app.addPoint = false;
       }
-      // lastHitBy === "AI"? app.humanScore ++ : app.aiScore ++ ;
-      //
-      // document.getElementById("scores").innerHTML = app.aiScore + " - " + app.humanScore;
-      //
-      // setTimeout(app.restartRound, 1000);
-
     }
   }
-
-  // if never hit the Table
-  // if ( && ) {
-  //   // if ball didn't bounce on the table at all after hit
-  //   if (app.hasCrossedNet(ball, lastHitBy)) {
-  //     console.log("didn't bounce at all");
-  //     document.getElementById("message").innerHTML = "didn't bounce at all";
-  //     lastHitBy === "AI"? app.humanScore ++ : app.aiScore ++ ;
-  //     document.getElementById("scores").innerHTML = app.aiScore + " - " + app.humanScore
-  //
-  //     ball.velocity.set(0, 0, 0);
-  //     setTimeout(app.restartRound, 1000);
-  //   }
-  // }
-
-
-  // if (app.hasCrossedNet(ball, lastHitBy) === false && app.justServed === false) {
-  //   //if app.justServed is true - it's not first serve - illegal bounce
-  //   console.log(`illegal bounce by ${lastHitBy}`);
-  //   app.restartRound();
-  // }
 };
 
 
@@ -821,11 +632,6 @@ app.calculateBallOutOfBounds = (ball) => {
       app.updateScores(app.justHit);
       app.addPoint = false;
     };
-    // app.updateScores(app.justHit);
-    // app.justHit === 'human'? app.aiScore++ : app.humanScore++ ;
-    // document.getElementById("scores").innerHTML = app.aiScore + " - " + app.humanScore
-    //
-    // setTimeout(app.restartRound, 1000);
   }
 
   // if ball is too high
@@ -839,11 +645,6 @@ app.calculateBallOutOfBounds = (ball) => {
 
 
 app.calculatePaddlehit = (ball, paddle, paddleAI) => {
-
-  // if(paddle.velocity){
-  //   app.guiControls.rollDebug = app.paddle.velocity.x;
-  // }
-
   // check human player
   if( app.justHit === 'AI'
       && ball.velocity.z > 0
@@ -903,23 +704,23 @@ app.calculatePaddlehit = (ball, paddle, paddleAI) => {
       )
       // DONE: fine tune this to be more accurate
       // paddleAI.rotation.y = (Math.random())*(-Math.PI/2) + Math.PI/4
-      paddleAI.rotation.y = THREE.Math.randFloat(Math.PI/15, -Math.PI/15);
+      // paddleAI.rotation.y = THREE.Math.randFloat(Math.PI/15, -Math.PI/15);
 
-      // if (app.ball.position.x >= 0 &&  app.ball.position.x < app.planeWidth/2 + 100) {
-      //   paddleAI.rotation.y = THREE.Math.mapLinear(
-      //     ball.position.x,
-      //     0, app.planeWidth/2 + 50,
-      //     0, - Math.PI/4
-      //   )
-      //   paddleAI.rotation.y = THREE.Math.clamp(paddleAI.rotation.y, 0, - Math.PI/4);
-      // } else if (app.ball.position.x < 0 && app.ball.position.x > -app.planeWidth/2 - 100) {
-      //   paddleAI.rotation.y = THREE.Math.mapLinear(
-      //     ball.position.x,
-      //     -app.planeWidth/2 - 50, 0,
-      //     Math.PI/4, 0
-      //   )
-      //   paddleAI.rotation.y = THREE.Math.clamp(paddleAI.rotation.y, Math.PI/4, 0);
-      // };
+      if (app.ball.position.x >= 0 &&  app.ball.position.x < app.planeWidth/2 + 100) {
+        paddleAI.rotation.y = THREE.Math.mapLinear(
+          ball.position.x,
+          0, app.planeWidth/2,
+          0, - Math.PI/6
+        )
+        paddleAI.rotation.y = THREE.Math.clamp(paddleAI.rotation.y, 0, - Math.PI/6);
+      } else if (app.ball.position.x < 0 && app.ball.position.x > -app.planeWidth/2 - 100) {
+        paddleAI.rotation.y = THREE.Math.mapLinear(
+          ball.position.x,
+          -app.planeWidth/2, 0,
+          Math.PI/6, 0
+        )
+        paddleAI.rotation.y = THREE.Math.clamp(paddleAI.rotation.y, Math.PI/6, 0);
+      };
 
       // ball.velocity.multiplyScalar(-1)
       ball.velocity.reflect( normalizedNormal );
