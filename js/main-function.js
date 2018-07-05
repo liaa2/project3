@@ -239,6 +239,7 @@ app.humanStart = () => {
   if (app.winner==="AI" && app.withinBounceRange(app.ball, app.paddle) && (app.paddle.position.z - app.ball.position.z) < 3) {
     app.ball.velocity.z = app.paddle.velocity.z * app.config.humanHitVelocityScale;
     app.winner = "";
+    app.pointHasBegun = true;
   }
 };
 
@@ -705,7 +706,7 @@ app.calculateTableBounce = (ball, lastHitBy) => {
     } else {
       // ball is on our side
       if( !app.justServed
-        && !app.pointHasBegun 
+        && app.pointHasBegun
       ){
         //if app.justServed is false - it's not first serve
         //the ball also didn't cross the net
