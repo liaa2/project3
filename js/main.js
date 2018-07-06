@@ -42,18 +42,22 @@ app.config = {
 }
 
 
-//audio setting
-// app.humanPaddleSound = new Audio("../audio/paddle1.mp3");
-// app.aiPaddleSound = new Audio("../audio/paddle2.mp3");
-// app.humanSide = new Audio("../audio/pong1.mp3");
-// app.aiSide = new Audio("../audio/pong2.mp3");
-// app.cheering = new Audio("../audio/cheering.mp3");
+const BASE = '"https://raw.githubusercontent.com/liaa2/Ping-Pong-Nano-Cup/master/';
 
-app.humanPaddleSound = new Audio("https://raw.githubusercontent.com/liaa2/Ping-Pong-Nano-Cup/master/audio/paddle1.mp3");
-app.aiPaddleSound = new Audio("https://raw.githubusercontent.com/liaa2/Ping-Pong-Nano-Cup/master/audio/paddle2.mp3");
-app.humanSide = new Audio("https://raw.githubusercontent.com/liaa2/Ping-Pong-Nano-Cup/master/audio/pong1.mp3");
-app.aiSide = new Audio("https://raw.githubusercontent.com/liaa2/Ping-Pong-Nano-Cup/master/audio/pong2.mp3");
-app.cheering = new Audio("https://raw.githubusercontent.com/liaa2/Ping-Pong-Nano-Cup/master/audio/cheering.mp3");
+// const BASE = '';
+
+//audio setting
+// app.humanPaddleSound = new Audio("../audio/paddle1.mp3`);
+// app.aiPaddleSound = new Audio("../audio/paddle2.mp3`);
+// app.humanSide = new Audio("../audio/pong1.mp3`);
+// app.aiSide = new Audio("../audio/pong2.mp3`);
+// app.cheering = new Audio("../audio/cheering.mp3`);
+
+app.humanPaddleSound = new Audio(`${BASE}audio/paddle1.mp3`);
+app.aiPaddleSound = new Audio(`${BASE}audio/paddle2.mp3`);
+app.humanSide = new Audio(`${BASE}audio/pong1.mp3`);
+app.aiSide = new Audio(`${BASE}audio/pong2.mp3`);
+app.cheering = new Audio(`${BASE}audio/cheering.mp3`);
 
 
 app.init = () => {
@@ -131,14 +135,14 @@ app.init = () => {
   app.loader.load(
     //resource URl AI
     // '../paddle.js',
-    'https://raw.githubusercontent.com/liaa2/Ping-Pong-Nano-Cup/master/paddle.js',
+    `${BASE}paddle.js`,
     loadPaddleAI
   );
 
   app.loader.load(
     //resource URl
     // '../paddle.js',
-    'https://raw.githubusercontent.com/liaa2/Ping-Pong-Nano-Cup/master/paddle.js',
+    `${BASE}paddle.js`,
     loadPaddle
   )
 

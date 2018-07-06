@@ -2,8 +2,6 @@ var app = app || {};
 
 app.createPlane = () => {
   var planeMaterial = new THREE.MeshLambertMaterial({ color: 0x3080C9 });
-  // let planeWidth = 150;
-  // let planeLength = 300;
   var planeGeometry = new THREE.PlaneGeometry(app.planeWidth, app.planeLength, 30)
   // create the surface
   var plane = new THREE.Mesh(planeGeometry, planeMaterial);
@@ -23,8 +21,10 @@ app.createNet = () => {
     side: THREE.DoubleSide,
   } );
 
-  var textureLoader = new THREE.TextureLoader(); //.load('img/net1.jpg');
-  textureLoader.load('img/net22.jpg', (texture) => {
+
+
+  var textureLoader = new THREE.TextureLoader();
+  textureLoader.load(`${BASE}img/net22.jpg`, (texture) => {
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
     texture.repeat.set(15, 1);
@@ -105,7 +105,7 @@ app.createBall = () => {
   var material = new THREE.MeshStandardMaterial( { color: 0xffd046 })
   var sphere = new THREE.Mesh( geometry, material )
   sphere.castShadow = true;
-  sphere.position.set(0, 30, -120); //-140);
+  sphere.position.set(0, 30, -120);
   sphere.velocity = new THREE.Vector3(0, 0, 1);
 
   return sphere;
@@ -118,16 +118,11 @@ app.createAmbientlight = () => {
 }
 
 app.createSpotlight = (x, y, z , color, intensity=1.0) => {
-  var spotLight = new THREE.SpotLight(color, intensity); //, 200, Math.PI/8, 1, 0  );
+  var spotLight = new THREE.SpotLight(color, intensity);
   spotLight.position.set(x,y,z);
-  // spotLight.penumbra = 0.2;
-  // spotLight.power = 0.5;
-  // spotLight.angle = Math.PI/4;
   spotLight.castShadow = true;
   spotLight.shadow.mapSize.width = 1024;
   spotLight.shadow.mapSize.height = 1024;
 
-  // var helper = new THREE.SpotLightHelper(spotLight);
-  // app.scene.add(helper);
   return spotLight;
 }
