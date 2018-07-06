@@ -132,6 +132,7 @@ app.init = () => {
   //instantiate loader
   app.loader = new THREE.JSONLoader();
   // python -m http.server
+  console.log('loading paddle model', `${BASE}paddle.js`, BASE);
   app.loader.load(
     //resource URl AI
     // '../paddle.js',
