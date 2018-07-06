@@ -311,15 +311,14 @@ window.addEventListener('resize', app.onResize, false);
 document.addEventListener('keydown', ev => {
   console.log(ev.keyCode, ev.key);
   switch(ev.key){
-    case ' ':
+    case ' ': //pause the game
       app.config.doBallUpdate = !app.config.doBallUpdate;
       console.log(`Ball movement ${ app.config.doBallUpdate ? 'unpaused' : 'paused'}.`)
       break;
-    case 'Enter':
-      // app.restartGame();
+    case 'Enter': // start the new game
       app.newGame();
       break;
-    case "Tab":
+    case "Tab": // jump to human player serve mode
       app.aiScore = app.winningScore;
       app.humanStart();
       break;
