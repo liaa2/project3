@@ -42,7 +42,7 @@ app.config = {
 }
 
 
-const BASE = '"https://raw.githubusercontent.com/liaa2/Ping-Pong-Nano-Cup/master/';
+const BASE = 'https://raw.githubusercontent.com/liaa2/Ping-Pong-Nano-Cup/master/';
 
 // const BASE = '';
 
