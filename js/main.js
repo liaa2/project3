@@ -130,13 +130,15 @@ app.init = () => {
   // python -m http.server
   app.loader.load(
     //resource URl AI
-    '../paddle.js',
+    // '../paddle.js',
+    'https://raw.githubusercontent.com/liaa2/Ping-Pong-Nano-Cup/master/paddle.js',
     loadPaddleAI
   );
 
   app.loader.load(
     //resource URl
-    '../paddle.js',
+    // '../paddle.js',
+    'https://raw.githubusercontent.com/liaa2/Ping-Pong-Nano-Cup/master/paddle.js',
     loadPaddle
   )
 
