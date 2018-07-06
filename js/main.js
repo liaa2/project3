@@ -1,16 +1,10 @@
 
 var app = app || {};
 
-// let reduction = 0.3
-
 app.planeWidth = 200;
 app.planeLength = 300;
 app.paddleWidth = 12 * app.planeWidth/100;
-// app.wallZ = 0; // - 150
-// app.fingers = [];
-// app.step = 0;
 app.guiControls = {
-  // bouncingSpeed: 0.05,
   bouncingSpeed: 1.2,
   rollDebug: '',
   ballVelocityScale: 1.5,
@@ -37,6 +31,7 @@ app.justServed = true;
 app.bounce = 0;
 //to check if the ball has bounced on the other side
 app.hasBouncedOnOppositeSide = false;
+//to actiave particle once and turn it off
 app.activeParticle = true;
 app.addPoint = true;
 
@@ -48,11 +43,17 @@ app.config = {
 
 
 //audio setting
-app.humanPaddleSound = new Audio("../audio/paddle1.mp3");
-app.aiPaddleSound = new Audio("../audio/paddle2.mp3");
-app.humanSide = new Audio("../audio/pong1.mp3");
-app.aiSide = new Audio("../audio/pong2.mp3");
-app.cheering = new Audio("../audio/cheering.mp3");
+// app.humanPaddleSound = new Audio("../audio/paddle1.mp3");
+// app.aiPaddleSound = new Audio("../audio/paddle2.mp3");
+// app.humanSide = new Audio("../audio/pong1.mp3");
+// app.aiSide = new Audio("../audio/pong2.mp3");
+// app.cheering = new Audio("../audio/cheering.mp3");
+
+app.humanPaddleSound = new Audio("https://raw.githubusercontent.com/liaa2/Ping-Pong-Nano-Cup/master/audio/paddle1.mp3");
+app.aiPaddleSound = new Audio("https://raw.githubusercontent.com/liaa2/Ping-Pong-Nano-Cup/master/audio/paddle2.mp3");
+app.humanSide = new Audio("https://raw.githubusercontent.com/liaa2/Ping-Pong-Nano-Cup/master/audio/pong1.mp3");
+app.aiSide = new Audio("https://raw.githubusercontent.com/liaa2/Ping-Pong-Nano-Cup/master/audio/pong2.mp3");
+app.cheering = new Audio("https://raw.githubusercontent.com/liaa2/Ping-Pong-Nano-Cup/master/audio/cheering.mp3");
 
 
 app.init = () => {
@@ -66,27 +67,22 @@ app.init = () => {
   // app.gui.add(app.guiControls, "particleVelocityScale", -2, 2);
   // app.gui.add(app.guiControls, "sideWalls");
   app.gui.add(app.guiControls, "easyMode");
-  app.gui.add(app.guiControls, "rollDebug").listen();
-  app.gui.add(app, "justHit").listen();
-  app.gui.add(app, "justServed").listen();
-  app.gui.add(app.guiControls, "hasCrossed").listen();
-  // app.gui.add(app.config, "aiXAngleOffset", -0.1, 0.1);// .listen();
+  // app.gui.add(app.guiControls, "rollDebug").listen();
+  // app.gui.add(app, "justHit").listen();
+  // app.gui.add(app, "justServed").listen();
+  // app.gui.add(app.guiControls, "hasCrossed").listen();
 
   //set up 3D
   app.scene = new THREE.Scene()
-  // app.scene.background = new THREE.Color( 0xffffff );
 
   app.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 )
   app.camera.position.set( 0, 80, 280 );
-  // camera.up = new THREE.Vector3(0,1,0);
-  // camera.lookAt( scene.position );
 
   app.renderer = new THREE.WebGLRenderer({ antialias: true})
   app.renderer.shadowMap.enabled = true;
   app.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   //rotate camera
   app.controls = new THREE.OrbitControls( app.camera, app.renderer.domElement );
-
 
   app.renderer.setSize( window.innerWidth, window.innerHeight )
   document.body.appendChild( app.renderer.domElement )
@@ -128,37 +124,12 @@ app.init = () => {
   //Light - pointLight
   app.spotLightL = app.createSpotlight(-150, 100, 0, 0xffffff);
   app.scene.add(app.spotLightL);
-  // app.spotLightR = app.createSpotlight(200, 100, 0, 0xffffff);
-  // app.scene.add(app.spotLightR);
 
-  // app.particleSystem = app.createParticleSystem();
-  // app.scene.add(app.particleSystem);
-
-  // app.pointLight2 = app.createPointlight2();
-  // app.scene.add(app.pointLight2);
-
-  //helper - (0,0,0) coordinates
-  // app.helper = app.createHelper();
-  // app.scene.add(app.helper);
-
-  // var helper = new THREE.AxisHelper( 10 );
-  // var helper = new THREE.AxesHelper( 10 );
-  // scene.add( helper );
-
-  //A loader for loading objects in JSON format. This uses the FileLoader internally for loading files.
-
-  // app.loaderAI = new THREE.JSONLoader();
-  // app.loaderAI.load(
-  //   //resource URl
-  //   '../paddle.js',
-  //   loadPaddleAI
-  // );
-
-  //instantiate a loader
+  //instantiate loader
   app.loader = new THREE.JSONLoader();
   // python -m http.server
   app.loader.load(
-    //resource URl
+    //resource URl AI
     '../paddle.js',
     loadPaddleAI
   );
@@ -189,78 +160,26 @@ app.init = () => {
   };
 
   //Paddle - user
-  // var x,y,z;
   function loadPaddle(geometry, materials){
     console.log('HERE');
     var scale = app.planeWidth/100;
     app.paddle = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial(materials) );
     app.paddle.scale.set(scale, scale, scale);
-    // app.paddle.position.set(0,30,120);
     app.paddle.position.set(0,30,160);
     app.paddle.velocity = new THREE.Vector3(0,0,0);
-    // paddle.position.set(x,y,z);
-    // paddle.rotation.y = 0.5 * Math.PI;
-    // paddle.rotation.x = -0.5 * Math.PI;
     app.paddle.rotation.y = 0;
-    // paddle.rotation.z = -0.5*Math.PI;
     app.scene.add( app.paddle );
 
 
     const surfaceGeometry = new THREE.CircleGeometry(app.paddleWidth/4, 20);
-    // const surfaceGeometry = new THREE.CircleBufferGeometry(app.paddleWidth/4, 8);
     const surfaceMaterial = new THREE.MeshBasicMaterial({ color: 0x00FF00, side: THREE.DoubleSide });
     app.surface = new THREE.Mesh( surfaceGeometry, surfaceMaterial );
     app.surface.visible = false;
-    // surface.geometry.computeFaceNormals();
     app.paddle.add( app.surface );
-    // app.scene.add(app.surface);
-    // app.paddle.children[0].position = app.paddle.position;
-
-    // app.paddle.children[0].geometry.normalsNeedUpdate = true;
-    //get the global position of surface (child object)
-
-    // app.paddle.updateMatrixWorld();
-
-    // app.vector = new THREE.Vector3();
-    // // app.surface.position = app.vector
-    // app.vector.setFromMatrixPosition(app.surface.matrixWorld);
-    // // app.surface.position.setFromMatrixPosition(app.surface.matrixWorld);
-    // app.normalizedPosition = app.vector.setFromMatrixPosition(app.surface.matrixWorld).clone().normalize();
-
-    // console.log("normalized position: ", app.normalizedPosition);
-    // console.log( "Original Position: " , app.vector.setFromMatrixPosition(app.surface.matrixWorld));
-
-    // var normalMatrix = new THREE.Matrix3().getNormalMatrix(app.paddle.matrixWorld);
-    // var newNoraml = normal.clone().applyMartrix3(normalMatrix).normalize();
-
-
-    // app.paddleHelper = new THREE.FaceNormalsHelper(app.surface, 5, 0xFF0000, 2);
-    // app.scene.add( app.paddleHelper );
-
-
-
-    // const normal = surfaceGeometry.computeFaceNormals();
-    // console.log(normal);
-
-    // console.log(app.paddle.position.setFromMatrixPosition(surface.matmatrixWorld));
-
-    // app.normal = new THREE.Vector3();
-    // for (var i = 0; i < app.surface.geometry.faces.length; i++) {
-    //   let coordinate = app.surface.geometry.faces[i].normal
-    //   app.normal.add(coordinate);
-    // }
-    // console.log(app.normal);
-
-    // const paddleHelper = new THREE.VertexNormalsHelper(surface, 5, 0xFF0000, 2);
-    // app.scene.add( paddleHelper );
-
-
 
     // don't start animating until the paddle is loaded
     app.animate();
-    // renderer.render( scene, camera )
   }
-  // app.animate();
 
 
 
@@ -310,18 +229,14 @@ app.init = () => {
   };
 
   app.controller = Leap.loop(app.options, function(frame){
-    // console.log(frame);
-    // console.log(frame.hands);
 
     //converts coordinates from Leap Space to THREE scene space
     if (frame.hands[0]){
 
        app.paddle.geometry.normalsNeedUpdate = true;
 
-      // console.log(frame.hands[0].roll());
       const hand = frame.hands[0];
       handMesh = hand.data('riggedHand.mesh');
-      // handMesh.position.set(0, 30, 150 )
 
       // Leap::Vector handSpeed = hand.palmVelocity(); -> The rate of change of the palm position in millimeters/second.
       handMesh.scenePosition(hand.palmPosition, app.paddle.position);
@@ -334,12 +249,13 @@ app.init = () => {
         hand.palmVelocity[2]
       );
 
+
+      //scale down hand movement and apply them to paddle rotation
       //using pitch() - hand rotation along x axis:
       if (app.paddle.position.y > 40) {
         let xAngleLM = THREE.Math.mapLinear(
           frame.hands[0].pitch(),
           -2, 2,
-          // -Math.PI/4, Math.PI/4
           -Math.PI/3, Math.PI/4
         );
         // If this vector's x, y or z value is greater than/less than the max/min vector's x, y or z value, it is replaced by the corresponding value.
@@ -349,7 +265,6 @@ app.init = () => {
         let xAngleLM = THREE.Math.mapLinear(
           frame.hands[0].pitch(),
           -2, 2,
-          // -Math.PI/4, Math.PI/4
           -Math.PI/4, Math.PI/6
         );
         xAngleLM = THREE.Math.clamp(xAngleLM, -Math.PI/4, Math.PI/6);
@@ -357,57 +272,22 @@ app.init = () => {
       }
 
 
-
-
       // using roll() - hand rotation along y axis:
-
       let yAngleLM = THREE.Math.mapLinear(
         frame.hands[0].roll(),   //value to map
         -2, 2,   //min & max input range
         Math.PI/3, -Math.PI/3  //min & max output
       );
-      // app.guiControls.rollDebug = frame.hands[0].pitch() ;
-      // let angle = THREE.Math.mapLinear(
-      //   frame.hands[0].pitch(),   //value to map
-      //   -1, 1,   //min & max input range
-      //   Math.PI/4, -Math.PI/4  //min & max output
-      // );
 
       yAngleLM = THREE.Math.clamp(yAngleLM, -Math.PI/3, Math.PI/3);
-      // app.guiControls.rollDebug = angle;
       app.paddle.rotation.y = yAngleLM
-
-      // app.paddle.children[0].geometry.normalsNeedUpdate = true;
-      // app.paddle.geometry.normalsNeedUpdate = true;
-      // app.paddle.updateMatrixWorld(true);
-      // app.paddle.updateMatrixWorld();
-      // app.surface.position.setFromMatrixPosition(app.surface.matrixWorld);
-      // console.log(app.normalizedPosition);
-      // console.log(app.vector.setFromMatrixPosition(app.surface.matrixWorld));
-
     }
   })//controller
 
   app.controller.use('transform', { scale: app.planeWidth/1000 })
-  .use("riggedHand", {
-    // boneLabels: function(boneMesh, leapHand){
-    //   return boneMesh.name
-    // }
-    // parent: scene,
-    // renderer: renderer,
-    // camera: camera,
-    // renderFn: () => renderer.render(scene, camera),
-    // scale: 0.001,
-    // positionScale: 2,
-    // offset: new THREE.Vector3(1000, 3090000, 120000),
-    // materialOptions: {
-    //   wireframe: true
-  })
+  .use("riggedHand")
 
   app.controller.connect();
-
-  // start off the animation loop
-
 };
 
 window.onload = app.init;
@@ -424,6 +304,8 @@ app.onResize = () => {
 
 window.addEventListener('resize', app.onResize, false);
 
+
+//key code mode - shortcut to debug
 document.addEventListener('keydown', ev => {
   console.log(ev.keyCode, ev.key);
   switch(ev.key){

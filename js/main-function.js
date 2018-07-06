@@ -70,11 +70,11 @@ app.humanStart = () => {
     app.ball.velocity.z = app.paddle.velocity.z * app.config.humanHitVelocityScale ;
     app.winner = "";
     app.justHit = "human";
-    // debugger;
     app.pointHasBegun = true;
   }
 };
 
+//reset global variables for new game and after each point
 app.setting = () => {
   app.paddleAI.rotation.x = 0;
   app.paddleAI.rotation.y = 0;
@@ -84,6 +84,7 @@ app.setting = () => {
   app.bounce = 0;
 }
 
+//new game starts
 app.newGame = () => {
   // console.log('here');
   document.getElementById("scores").innerHTML = "0 - 0";
