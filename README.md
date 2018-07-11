@@ -5,7 +5,10 @@
 
 
 ### Link to live game
- - Please click here to play the game, Leap Motion is Required [GitHub page](https://liaa2.github.io/Ping-Pong-Nano-Cup/)
+ - Please click here to play the game, LEAP MOTION IS REQUIRED [GitHub page](https://liaa2.github.io/Ping-Pong-Nano-Cup/)
+ - A short video Demo (https://drive.google.com/file/d/1tpCQKAI8iyXd3TQ8omqKaJ2j8SfSigPE/view)
+
+(https://raw.githubusercontent.com/liaa2/Ping-Pong-Nano-Cup/master/img/screenshot.png)
 
 ### Instructions
  1. AI takes the first serve when the game starts, after that the first serve person would be the player who lose in the previous round.

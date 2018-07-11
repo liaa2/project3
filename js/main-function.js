@@ -378,6 +378,7 @@ app.updateScores = () => {
 }
 
 
+//Core Game Logic - winning decision
 app.calculateTableBounce = (ball, lastHitBy) => {
 
   // Table bounce
@@ -469,6 +470,7 @@ app.calculateTableBounce = (ball, lastHitBy) => {
 };
 
 
+//hit the net & out of range condition
 app.calculateBallOutOfBounds = (ball) => {
   /* ALSO NEED TO CHECK:
      - if ball is too far off the side of the table (only when sideWalls are off)
@@ -510,7 +512,7 @@ app.calculateBallOutOfBounds = (ball) => {
 };
 
 
-// calculate paddle hitting position and angle
+// calculate paddle hitting position and angle - decide how the paddle should react
 app.calculatePaddlehit = (ball, paddle, paddleAI) => {
   // AI just hit, not it is human player's turn
   if( app.justHit === 'AI'
