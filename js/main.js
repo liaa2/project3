@@ -1,3 +1,4 @@
+ // run server: python -m http.server
 
 var app = app || {};
 
@@ -44,15 +45,6 @@ app.config = {
 
 const BASE = 'https://raw.githubusercontent.com/liaa2/Ping-Pong-Nano-Cup/master/';
 
-// const BASE = '';
-
-//audio setting
-// app.humanPaddleSound = new Audio("../audio/paddle1.mp3`);
-// app.aiPaddleSound = new Audio("../audio/paddle2.mp3`);
-// app.humanSide = new Audio("../audio/pong1.mp3`);
-// app.aiSide = new Audio("../audio/pong2.mp3`);
-// app.cheering = new Audio("../audio/cheering.mp3`);
-
 app.humanPaddleSound = new Audio(`${BASE}audio/paddle1.mp3`);
 app.aiPaddleSound = new Audio(`${BASE}audio/paddle2.mp3`);
 app.humanSide = new Audio(`${BASE}audio/pong1.mp3`);
@@ -60,21 +52,12 @@ app.aiSide = new Audio(`${BASE}audio/pong2.mp3`);
 app.cheering = new Audio(`${BASE}audio/cheering.mp3`);
 
 
+// start to setup lights, objects(load paddles for user and AI), camera etc
 app.init = () => {
   console.log("loaded");
 
   app.gui = new dat.GUI();
-  // app.gui.add(app.guiControls, "bouncingSpeed", 0, 1);
-  // app.gui.add(app.guiControls, "bouncingSpeed", 0, 2);
-  // app.gui.add(app.guiControls, "ballVelocityScale", 0, 3);
-  // app.gui.add(app.guiControls, "gravity", 0, 0.05);
-  // app.gui.add(app.guiControls, "particleVelocityScale", -2, 2);
-  // app.gui.add(app.guiControls, "sideWalls");
   app.gui.add(app.guiControls, "easyMode");
-  // app.gui.add(app.guiControls, "rollDebug").listen();
-  // app.gui.add(app, "justHit").listen();
-  // app.gui.add(app, "justServed").listen();
-  // app.gui.add(app.guiControls, "hasCrossed").listen();
 
   //set up 3D
   app.scene = new THREE.Scene()
@@ -131,18 +114,15 @@ app.init = () => {
 
   //instantiate loader
   app.loader = new THREE.JSONLoader();
-  // python -m http.server
-  console.log('loading paddle model', `${BASE}paddle.js`, BASE);
+
   app.loader.load(
-    //resource URl AI
-    // '../paddle.js',
+    //resource URl AI  
     `${BASE}paddle.js`,
     loadPaddleAI
   );
 
   app.loader.load(
     //resource URl
-    // '../paddle.js',
     `${BASE}paddle.js`,
     loadPaddle
   )
@@ -189,52 +169,15 @@ app.init = () => {
   }
 
 
+  //=================== Leap Motion Controller ===========================
 
-  //=======================mouse pad mode================================
-
-  // document.addEventListener("mousemove", e => {
-  //   // console.log("e.page: ", e.pageX, e.pageY, e);
-  //
-  //   if( e.shiftKey ){
-  //     const yAngle = THREE.Math.mapLinear(
-  //       e.pageX,
-  //       0, window.innerWidth,
-  //       Math.PI/4, -Math.PI/4
-  //     );
-  //     app.paddle.rotation.y = yAngle;
-  //
-  //     const xAngle = THREE.Math.mapLinear(
-  //       e.pageY,
-  //       0, window.innerHeight,
-  //       Math.PI/4, -Math.PI/4
-  //     );
-  //     app.paddle.rotation.x = xAngle;
-  //     return; // don't change the position with the code below
-  //   }
-  //
-  //
-  //   app.paddle.position.x = THREE.Math.mapLinear(
-  //     e.pageX,
-  //     0, window.innerWidth,
-  //     -100, 100
-  //   );
-  //   app.paddle.position.y = THREE.Math.mapLinear(
-  //     e.pageY,
-  //     0, window.innerHeight,
-  //     60, 10
-  //   );
-  //
-  //   // app.paddle.position.y = THREE.Math.mapLinear(e.pagey, 90, 1000, )
-  // });
-
-
-  //===================Leap Motion Controller mode===========================
   //initiate animationFrame & gestures
   app.options = {
     frameEventName: 'animationFrame',
     enableGestures: true,
   };
 
+  // The loop() function sets up the Leap controller and WebSocket connection and invokes the specified callback function on a regular update intervall. Don't need to create my own controller when using this method.
   app.controller = Leap.loop(app.options, function(frame){
 
     //converts coordinates from Leap Space to THREE scene space
@@ -291,9 +234,12 @@ app.init = () => {
     }
   })//controller
 
+  // Begin using a registered plugin. The plugin is run for animationFrames only.
+  // list of plugins: https://developer-archive.leapmotion.com/javascript#plugins
   app.controller.use('transform', { scale: app.planeWidth/1000 })
   .use("riggedHand")
 
+  // Connects this Controller object to the Leap Motion WebSocket server. If the connection succeeds, the controller can begin supplying tracking data
   app.controller.connect();
 };
 
@@ -318,7 +264,7 @@ document.addEventListener('keydown', ev => {
   switch(ev.key){
     case ' ': //pause the game
       app.config.doBallUpdate = !app.config.doBallUpdate;
-      console.log(`Ball movement ${ app.config.doBallUpdate ? 'unpaused' : 'paused'}.`)
+      // console.log(`Ball movement ${ app.config.doBallUpdate ? 'unpaused' : 'paused'}.`)
       break;
     case 'Enter': // start the new game
       app.newGame();

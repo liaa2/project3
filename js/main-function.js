@@ -1,19 +1,5 @@
  var app = app || {};
 
-/*
-TODO:
-
-- AI plays worse:
-  - AI should sometimes fail to return ball
-    - too high?
-    - too fast?
-    - ball didn't bounce (so )
-
-- AI plays better:
-  - return more balls (better angle, over the net more)
-
-*/
-
 //animation
 app.animate = () => {
 
@@ -86,11 +72,9 @@ app.setting = () => {
 
 //new game starts
 app.newGame = () => {
-  // console.log('here');
+
   document.getElementById("scores").innerHTML = "0 - 0";
   document.getElementById("message").innerHTML = "First to " + app.winningScore + " scores wins!";
-
-  // console.log('reset particles');
 
   if (app.particleSystem) {
     app.particleSystem.geometry.dispose();
@@ -103,7 +87,7 @@ app.newGame = () => {
   if( app.winner === "AI" ){
     // human starts
     app.ball.position.set(0, 30, 150);
-    // app.humanStart();
+
   } else {
     app.ball.position.set(0, 30, -150);
     app.ball.velocity.set(0, 0, 1.3);
@@ -139,23 +123,6 @@ app.restartRound  = () =>  {
   app.ball.velocity.set(0, 0, 1.3);
 
   app.justHit = "AI";  // reset last-hit tracker
-
-
-  // TODO: this code needs to run all the time (until serve is finished),
-  // NOT just once inside this restartRound() function
-  // if (app.withinBounceRange(app.ball, app.paddle) && (app.paddle.position.z - app.ball.position.z) < 4) {
-  //   // Ball is served! (hit)
-  //   app.humanPaddleSound.play();
-  //   app.ball.velocity.z = app.paddle.velocity.z * app.config.humanHitVelocityScale;
-  //   app.justHit = "human";
-  //   app.pointHasBegun = true;
-  //   console.warn('SERVE DETECTED from inside restartRound()');
-  // }
-  // }
-//initial serve
-// app.justServed = true;
-// app.hasBouncedOnOppositeSide = false;
-// app.addPoint = true;
 };
 
 //Ping pong ball moves
@@ -175,51 +142,9 @@ app.updateBall = () => {
   // clamp Y, no sinking through table
   app.ball.position.y = Math.max(2, app.ball.position.y);
 
-  // // apply velocity ( not using this because we want gravity to be separate to the ball velocity scaling )
-  // app.ball.position.addScaledVector(
-  //   app.ball.velocity,
-  //   app.guiControls.ballVelocityScale
-  // );
-
-  //============ ball collides with user's paddle ====================
-  // if( pos.x >= paddle.x - app.paddleWidth/2 &&
-  //     pos.x <= paddle.x + app.paddleWidth/2){
-  //
-  //   if( pos.y >= paddle.y - app.paddleWidth/2 &&
-  //       pos.y <= paddle.y + app.paddleWidth/2 &&
-  //       paddle.z - pos.z < 4 &&
-  //        app.ball.velocity.z > 0 ){
-  //
-  //     // if (pos.z - paddle.z < 4){
-  //       // console.log("Hit!");
-  //       // app.ball.velocity.multiplyScalar(-1);
-  //     // }
-  //
-  //     //ball bounce back after hitted, add y value as gravity
-  //     // console.log(app.ball.velocity);
-  //
-  //     // app.ball.velocity.add(new THREE.Vector3(0,1,3)).multiplyScalar(-1);
-  //
-  //     // app.ball.velocity.reflect(app.normalizedPosition).multiplyScalar(5)
-  //
-  //     const normalMatrix = new THREE.Matrix3().getNormalMatrix( app.surface.matrixWorld );
-  //     const normalizedNormal = app.surface.geometry.faces[0].normal.clone().applyMatrix3( normalMatrix ).normalize()
-  //
-  //     // app.ball.velocity.reflect( normalizedNormal );
-  //     console.log('reflecting');
-  //      //.multiplyScalar(1.2);
-  //
-  //     app.ball.velocity.reflect( normalizedNormal ).multiplyScalar(app.guiControls.bouncingSpeed);
-  //
-  //     // console.log(app.ball.velocity.reflect(app.normalizedPosition));
-  //     // app.ball.velocity.reflect( app.paddle.geometry.faces[0].normal );
-  //   }
-  // } // ball within x range - inbound
-
   app.calculateBallOutOfBounds(app.ball);
 
   app.calculatePaddlehit(app.ball, app.paddle, app.paddleAI);
-
 
   app.guiControls.hasCrossed = app.hasCrossedNet(app.ball, app.justHit);
 
@@ -238,8 +163,8 @@ app.updateBall = () => {
 //easy mode to help user find ball position (x axis and y axis)
 app.easyMode = () => {
   if (app.guiControls.easyMode && app.ball.velocity.z > 0 ) {
-    app.paddle.position.x = app.ball.position.x
-    app.paddle.position.y = app.ball.position.y
+    app.paddle.position.x = app.ball.position.x;
+    app.paddle.position.y = app.ball.position.y;
   }
 }
 
@@ -249,7 +174,7 @@ app.createParticleSystem = () => {
 
   const particles = new THREE.Geometry();
 
-  const dist = app.guiControls.particleDistribution
+  const dist = app.guiControls.particleDistribution;
 
   for (var i = 0; i < app.guiControls.numParticles; i++) {
 
@@ -309,7 +234,6 @@ app.animateParticles = () => {
 
 app.showParticleSystem = () => {
   if (app.winner && app.activeParticle) {
-    // console.log("show Particle System");
     app.particleSystem = app.createParticleSystem();
     app.scene.add(app.particleSystem);
     app.activeParticle = false;
@@ -404,15 +328,12 @@ app.calculateTableBounce = (ball, lastHitBy) => {
           ball.velocity.x *= 0.2;
           ball.velocity.z *= 0.2;
 
-          // app.ball.velocity.x = 0;
-          // app.ball.velocity.y = 0;
-          // app.ball.velocity.z = 0;
           if (app.addPoint) {
             lastHitBy === "AI"? app.aiScore ++ : app.humanScore ++;
             document.getElementById("scores").innerHTML = app.aiScore + " - " + app.humanScore;
             app.addPoint = false;
           }
-          // debugger;
+
           setTimeout(app.restartRound, 1000);
         }
         //ball hasn't bounce on the other side - first time bounce on the other side
@@ -429,7 +350,6 @@ app.calculateTableBounce = (ball, lastHitBy) => {
       ){
         //the ball also didn't cross the net
         //illegal bounce
-        console.log(`illegal bounce by ${lastHitBy}`);
         document.getElementById("message").innerHTML = "illegal bounce by " + lastHitBy;
 
         ball.velocity.x *= 0.2;
@@ -446,6 +366,7 @@ app.calculateTableBounce = (ball, lastHitBy) => {
       app.pointHasBegun = false;
     } //end else of hasCrossedNet
   } else {
+
     // No bounce at all
 
     if (app.hasCrossedNet(ball, lastHitBy) && (Math.abs(app.ball.position.z) > app.planeLength/2+10 || Math.abs(app.ball.position.x) > app.planeWidth/2+10) && !app.hasBouncedOnOppositeSide && Math.abs(ball.velocity.z) > 0) {
@@ -458,7 +379,7 @@ app.calculateTableBounce = (ball, lastHitBy) => {
       app.paddleAI.position.x = ball.position.x - 50;
       app.paddleAI.position.y = ball.position.y - 50;
 
-      console.log(`${lastHitBy} out`);
+      // console.log(`${lastHitBy} out`);
       document.getElementById("message").innerHTML = lastHitBy + " out!"
 
       if (app.addPoint) {
@@ -472,12 +393,6 @@ app.calculateTableBounce = (ball, lastHitBy) => {
 
 //hit the net & out of range condition
 app.calculateBallOutOfBounds = (ball) => {
-  /* ALSO NEED TO CHECK:
-     - if ball is too far off the side of the table (only when sideWalls are off)
-     - if ball has bounced more than once
-     - if ball has bounced on your own side before crossing net (see calculateTableBounce method above)
-     - if ball has hit net
-  */
 
   // if ball has hit net
   if ( Math.abs(ball.position.x) <= app.planeWidth/2
@@ -489,7 +404,7 @@ app.calculateBallOutOfBounds = (ball) => {
         ||
         (app.justHit === 'AI' && ball.velocity.z > 0 ))
     ){
-    console.log(`${app.justHit} hit the net!`);
+    // console.log(`${app.justHit} hit the net!`);
     document.getElementById("message").innerHTML = app.justHit + " hit the net!"
     // ball.velocity.set(0, 0, 0);
     ball.velocity.z *= -1;
@@ -504,7 +419,7 @@ app.calculateBallOutOfBounds = (ball) => {
 
   // if ball is too high - y position
   if (ball.position.y > 80 && Math.abs(ball.position.z) === app.planeLength/2) {
-    console.log("ball is too high, can't catch it");
+    // console.log("ball is too high, can't catch it");
     document.getElementById("message").innerHTML = "ball is too high, can't catch it"
     setTimeout(app.restartRound, 1000);
   }
@@ -524,15 +439,13 @@ app.calculatePaddlehit = (ball, paddle, paddleAI) => {
     let normalMatrix = new THREE.Matrix3().getNormalMatrix( app.surface.matrixWorld );
     let normalizedNormal = app.surface.geometry.faces[0].normal.clone().applyMatrix3( normalMatrix ).normalize();
 
-    // console.log('reflecting!');
-
     ball.velocity.reflect( normalizedNormal )
-    // .multiplyScalar(app.guiControls.bouncingSpeed);
 
     //play the sound
     ball.position.y > 0? app.humanPaddleSound.play(): app.humanPaddleSound.pause();
 
     app.justHit = "human"; // toggle the value for who just hit
+
     //to check if the ball has crossed the net
     app.hasBouncedOnOppositeSide = false;
     ball.velocity.z += paddle.velocity.z * app.config.humanHitVelocityScale;
@@ -545,31 +458,12 @@ app.calculatePaddlehit = (ball, paddle, paddleAI) => {
     let normalMatrix = new THREE.Matrix3().getNormalMatrix( app.surfaceAI.matrixWorld );
     let normalizedNormal = app.surfaceAI.geometry.faces[0].normal.clone().applyMatrix3( normalMatrix ).normalize();
 
-    // console.log('reflecting back!');
-
-    // DISABLE X AXIS (height) ANGLE FOR NOW
-    // if (paddleAI.position.y > 45) {
-    //   paddleAI.rotation.x = THREE.Math.randFloat(-Math.PI/16, Math.PI/12);
-    //   app.guiControls.rollDebug = 'higher';
-    // } else {
-    //   paddleAI.rotation.x = THREE.Math.randFloat(
-    //     app.config.aiXAngleOffset - Math.PI/12,
-    //     app.config.aiXAngleOffset + Math.PI/16
-    //   );
-    //   app.guiControls.rollDebug = 'lower';
-    //
-    // }
-
     //adjust AI paddle x axis rotation based on ball's height - paddle tilt up or down
-    // paddleAI.rotation.x = mapLinear
     paddleAI.rotation.x = THREE.Math.mapLinear(
       ball.position.y,
       - 20, 100,
       -Math.PI/4, Math.PI/4
     )
-    // DONE: fine tune this to be more accurate
-    // paddleAI.rotation.y = (Math.random())*(-Math.PI/2) + Math.PI/4
-    // paddleAI.rotation.y = THREE.Math.randFloat(Math.PI/15, -Math.PI/15);
 
     //adjust AI paddle y axis rotation based on ball's x position - keep the ball bounce on the table
     if (app.ball.position.x >= 0 &&  app.ball.position.x < app.planeWidth/2 + 100) {

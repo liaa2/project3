@@ -24,7 +24,6 @@ app.createNet = () => {
 
 
   var textureLoader = new THREE.TextureLoader();
-  console.log('loading net:', `img/net22.jpg`);
   textureLoader.load(`img/net22.jpg`, (texture) => {
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
