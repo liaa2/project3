@@ -116,7 +116,7 @@ app.init = () => {
   app.loader = new THREE.JSONLoader();
 
   app.loader.load(
-    //resource URl AI  
+    //resource URl AI
     `${BASE}paddle.js`,
     loadPaddleAI
   );
@@ -169,7 +169,45 @@ app.init = () => {
   }
 
 
-  //=================== Leap Motion Controller ===========================
+  //======================= version 1: mouse pad mode ================================
+
+  // document.addEventListener("mousemove", e => {
+  //   // console.log("e.page: ", e.pageX, e.pageY, e);
+  //
+  //   if( e.shiftKey ){
+  //     const yAngle = THREE.Math.mapLinear(
+  //       e.pageX,
+  //       0, window.innerWidth,
+  //       Math.PI/4, -Math.PI/4
+  //     );
+  //     app.paddle.rotation.y = yAngle;
+  //
+  //     const xAngle = THREE.Math.mapLinear(
+  //       e.pageY,
+  //       0, window.innerHeight,
+  //       Math.PI/4, -Math.PI/4
+  //     );
+  //     app.paddle.rotation.x = xAngle;
+  //     return; // don't change the position with the code below
+  //   }
+  //
+  //
+  //   app.paddle.position.x = THREE.Math.mapLinear(
+  //     e.pageX,
+  //     0, window.innerWidth,
+  //     -100, 100
+  //   );
+  //   app.paddle.position.y = THREE.Math.mapLinear(
+  //     e.pageY,
+  //     0, window.innerHeight,
+  //     60, 10
+  //   );
+  //
+  //   // app.paddle.position.y = THREE.Math.mapLinear(e.pagey, 90, 1000, )
+  // });
+
+
+  //=================== version 2: Leap Motion Controller Mode ===========================
 
   //initiate animationFrame & gestures
   app.options = {
